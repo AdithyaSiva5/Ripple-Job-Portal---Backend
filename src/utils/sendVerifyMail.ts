@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { Request } from "express";
 import { SessionData } from "express-session";
+import dotenv from "dotenv"
+
 
 const sendVerifyMail = async (req: Request, name: string, email: string) => {
   try {
@@ -9,22 +11,22 @@ const sendVerifyMail = async (req: Request, name: string, email: string) => {
     sessionData!.otpGeneratedTime = Date.now();
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587,
+      port: 587, 
       secure: false,
       requireTLS: true,
       tls: {
         rejectUnauthorized: false,
       },
       auth: {
-        user: "circleupindia@gmail.com",
-        pass: "yonq znss qruc qrjh",
+        user: process.env.NODEMAILER_EMAIL,
+        pass: process.env.NODEMAILER_PASSWORD,
       },
     });
 
 
     
     const mailOptions: nodemailer.SendMailOptions = {
-      from: "circleupindia@gmail.com",
+      from: "ripplejobportal@gmail.com",
       to: email,
       subject: "For verification purpose",
       html: `<html lang="en">
