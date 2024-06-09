@@ -48,7 +48,7 @@ const PostSchema = new Schema<PostInterface>({
         default:false
     }
     
-});
+},{timestamps:true});
 
 const Post = model<PostInterface>('Post', PostSchema);
 

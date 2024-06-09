@@ -1,4 +1,4 @@
-import { Document, Schema, Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 interface PostInterface extends Document {
     userId: Types.ObjectId;
@@ -12,6 +12,7 @@ interface PostInterface extends Document {
     hideComment: boolean;
     hideLikes:boolean;
     isDeleted:boolean;
+    timestamp: Date;
 }
 
 export default PostInterface;

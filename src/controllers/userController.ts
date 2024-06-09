@@ -6,7 +6,10 @@ import generateToken from "../utils/generateToken";
 import sendVerifyMail from "../utils/sendVerifyMail";
 import speakeasy from "speakeasy";
 
-//Controller for User Registration
+
+// @desc    Register new User
+// @route   USER /register
+// @access  Public
 
 export const registerUser = asyncHandler(
   async (req: Request, res: Response) => {
@@ -43,7 +46,10 @@ export const registerUser = asyncHandler(
   }
 );
 
-// OTP VERIFICATION
+
+// @desc    Register OTP Verification
+// @route   USER /register-otp
+// @access  Public
 
 export const verifyOTP = asyncHandler(async (req: Request, res: Response) => {
   const { otp } = req.body;
@@ -63,6 +69,13 @@ console.log(storedOTP);
     res.status(400);
     throw new Error("Invalid OTP");
   }
+  const otpGeneratedTime = sessionData.otpGeneratedTime || 0;
+  const currentTime = Date.now();
+  const otpExpirationTime = 60 * 1000; 
+  if (currentTime - otpGeneratedTime > otpExpirationTime) {
+    res.status(400);
+    throw new Error("OTP has expired");
+  }
 
   const userDetails = sessionData.userDetails;
   if (!userDetails) {
@@ -81,7 +94,12 @@ console.log(storedOTP);
   res.status(200).json({ message: "OTP verified succesfully, user created", user });
 });
 
-// OTP Resend
+
+
+// @desc    Resent OTP 
+// @route   USER /resend-otp
+// @access  Public
+
 
 export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
   const {email} = req.body;
@@ -105,7 +123,9 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
 });
 
 
-// User Login
+// @desc    User Login
+// @route   USER /login
+// @access  Public
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -137,8 +157,10 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
+// @desc    Google Authentication
+// @route   USER /google-auth
+// @access  Public
 
-//googleAuth
 
 export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
   const { username, email, imageUrl } = req.body;
@@ -194,7 +216,9 @@ export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
 });
 
 
-// Forgot Password
+// @desc    Forgot Password
+// @route   USER /forgot-password
+// @access  Public
 
 export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -221,7 +245,11 @@ export const forgotPassword = asyncHandler(async (req: Request, res: Response) =
 });
 
 
-// Forgot Password  OTP verification
+
+
+// @desc    Forgot Password OTP verification
+// @route   USER /forgot-otp
+// @access  Public
 export const forgotOtp = asyncHandler(async (req: Request, res: Response) => {
   const { otp } = req.body;
   if (!otp) { 
@@ -238,7 +266,7 @@ export const forgotOtp = asyncHandler(async (req: Request, res: Response) => {
   }
   const otpGeneratedTime = sessionData.otpGeneratedTime || 0;
   const currentTime = Date.now();
-  const otpExpirationTime = 30 * 1000; 
+  const otpExpirationTime = 60 * 1000; 
   if (currentTime - otpGeneratedTime > otpExpirationTime) {
     res.status(400);
     throw new Error("OTP has expired");
@@ -253,8 +281,9 @@ export const forgotOtp = asyncHandler(async (req: Request, res: Response) => {
 });
 
 
-
-// Reset Password
+// @desc    Reset-Password
+// @route   USER /reset-passwordt
+// @access  Public
 export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
   const { password, confirmPassword } = req.body;
   const sessionData = req.session;
