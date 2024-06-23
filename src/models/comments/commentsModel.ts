@@ -1,6 +1,13 @@
 
 import { Schema, model, Document, Types } from 'mongoose';
-import CommentInterface from "./commentTypes";
+import {ReplyCommentInterface , CommentInterface }from './commentTypes'
+
+const ReplyCommentSchema = new Schema<ReplyCommentInterface>({
+  userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  replyComment: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+});
+
 
 const CommentSchema = new Schema<CommentInterface>({
     postId: {
@@ -13,7 +20,7 @@ const CommentSchema = new Schema<CommentInterface>({
       ref: 'User',
       required: true,
     },
-    content: {
+    comment: {
       type: String,
       required: true,
     },
@@ -21,10 +28,8 @@ const CommentSchema = new Schema<CommentInterface>({
       type: Boolean,
       default: false,
     },
-    timestamp: {
-      type: Date,
-      default: Date.now,
-    },
+    replyComments: [ReplyCommentSchema]
+ 
   },{timestamps:true});
   
   const Comment = model<CommentInterface>('Comment', CommentSchema);

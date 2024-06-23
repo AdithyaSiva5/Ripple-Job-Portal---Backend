@@ -2,15 +2,19 @@
 
 import { Schema, model, Document, Types } from 'mongoose';
 
-
-
-
-interface CommentInterface extends Document {
-  postId: Types.ObjectId;
-  userId: Types.ObjectId;
-  content: string;
-  isDeleted: boolean;
+export interface ReplyCommentInterface {
+  userId: Schema.Types.ObjectId | string;
+  replyComment : string;
   timestamp: Date;
 }
 
-export default CommentInterface;
+
+export interface CommentInterface extends Document {
+  postId: Types.ObjectId;
+  userId: Types.ObjectId;
+  comment: string;
+  isDeleted: boolean;
+  timestamp: Date;
+  replyComments : ReplyCommentInterface[];
+}
+
