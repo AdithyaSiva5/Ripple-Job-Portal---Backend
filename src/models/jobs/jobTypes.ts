@@ -13,4 +13,6 @@ export interface IJob extends Document {
   jobDescription?: string;
   qualification?: string;
   isDeleted: boolean;
+  isBlocked:boolean;
+  isAdminBlocked:boolean;
 }

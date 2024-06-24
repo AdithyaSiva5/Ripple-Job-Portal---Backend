@@ -8,6 +8,7 @@ import generateToken from "../utils/generateToken";
 import bcrypt from "bcryptjs";
 import User from "../models/user/userModel";
 import JobCategory from "../models/jobCategory/jobCategoryModel";
+import Job from "../models/jobs/jobModel";
 
 
 
@@ -187,4 +188,50 @@ export const blockJobCategory = asyncHandler(async (req: Request, res: Response)
   const allJobCategory = await JobCategory.find({}).sort({date:-1});
   const blocked = jobCategory.isBlocked?"Blocked":"Unblocked"
   res.status(200).json({ allJobCategory,message: `You have ${blocked} ${jobCategory.jobCategory}`});
+});
+
+  // @desc    Get all posts
+// @route   ADMIN /admin/get-posts
+// @access  Private
+export const getJobs = asyncHandler(async (req: Request, res: Response) => {
+  const page: number = parseInt(req.query.page as string, 10) || 1;
+  const limit: number = 6; 
+  const skip: number = (page - 1) * limit;
+
+  const totalJobs: number = await Job.countDocuments({ isDeleted: false });
+  const totalPages: number = Math.ceil(totalJobs / limit);
+
+  const jobs = await Job.find({ isDeleted: false })
+    .populate('userId')
+    .skip(skip)
+    .limit(limit);
+
+  if (jobs.length > 0) {
+    res.status(200).json({ jobs, totalPages });
+  } else {
+    res.status(404).json({ message: "No Jobs Found" });
+  }
+});
+
+  // @desc    Block job
+// @route   ADMIN /admin/block-user
+// @access  Private
+
+export const jobBlock = asyncHandler(async (req: Request, res: Response) => {
+  const jobId = req.body.jobId; 
+ 
+  const job = await Job.findById(jobId)
+
+  if (!job) {
+    res.status(400);
+    throw new Error('Post not found');
+  }
+
+  job.isAdminBlocked = !job.isAdminBlocked;
+  await job.save();
+
+  const  jobs = await Job.find({ isDeleted:false}).populate('userId');
+  const blocked = job.isAdminBlocked?"Blocked":"Unblocked"
+
+  res.status(200).json({ jobs,message:`Job has been ${blocked}`});
 });

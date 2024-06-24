@@ -47,6 +47,17 @@ const jobSchema: Schema<IJob> = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isBlocked:{
+    type: Boolean,
+    default: false,
+
+  },
+  isAdminBlocked:{
+    type: Boolean,
+    default: false,
+
+  }
+
 }, {
   timestamps: true,
 });
