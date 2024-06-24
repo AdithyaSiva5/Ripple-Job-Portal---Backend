@@ -10,7 +10,6 @@ import {
   resetPassword,
   updateUserTypeAndHiring,
   updateBasicInformation,
-  userSuggestions,
   getUserDetails,
   updateUserRole
 } from "../controllers/userController";
@@ -32,7 +31,6 @@ router.post("/reset-password", resetPassword);
 router.post("/set-preferences", updateUserTypeAndHiring);
 router.post("/set-user-role", updateUserRole);
 router.post("/set-basic-information",updateBasicInformation);
-router.post('/user-suggestions',userSuggestions);
 router.get('/user-details/:userId',getUserDetails);
 
 export default router;

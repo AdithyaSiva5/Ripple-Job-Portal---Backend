@@ -8,6 +8,8 @@ import session, { SessionOptions,MemoryStore , SessionData} from "express-sessio
 import jobRoutes from './routes/jobRoutes';
 import cors from 'cors'
 import postRoutes from './routes/postRoutes';
+import path from 'path'
+
 
 
 dotenv.config();
@@ -27,8 +29,19 @@ app.use(cors({
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials:true
 }))
+
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+  });
+
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+// const uploadDir = path.join(__dirname, 'public/uploads');
+// app.use('/uploads', express.static(uploadDir));
+// console.log(uploadDir)
+
 
 const sessionSecret = process.env.SESSION_SECRET || 'default_secret_key';
 
