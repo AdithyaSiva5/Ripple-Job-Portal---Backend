@@ -5,7 +5,6 @@ import userRoutes from "./routes/userRoutes"
 import adminRoutes from "./routes/adminRoutes"
 import errorHandler from "./middlewares/errorMiddleware";
 import session, { SessionOptions,MemoryStore , SessionData} from "express-session"
-import connectionRoutes from './routes/connectionRoutes';
 import jobRoutes from './routes/jobRoutes';
 import cors from 'cors'
 import postRoutes from './routes/postRoutes';
@@ -44,7 +43,6 @@ app.use(session({
 app.use('/api/',userRoutes)
 app.use('/api/admin',adminRoutes)
 app.use('/api/post',postRoutes)
-app.use("/api/connection", connectionRoutes);
 app.use('/api/job',jobRoutes);
 app.use(errorHandler)
 

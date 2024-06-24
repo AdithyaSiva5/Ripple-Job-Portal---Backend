@@ -321,7 +321,6 @@ export const resetPassword = asyncHandler(async (req: Request, res: Response) =>
 
 export const updateUserTypeAndHiring = async (req: Request, res: Response) => {
   try {
-
     const {userId, userType, isHiring } = req.body;
 
     const user = await User.findById(userId);

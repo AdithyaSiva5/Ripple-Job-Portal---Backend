@@ -17,7 +17,7 @@ const UserSchema: Schema<IUser> = new Schema({
   isFacebook:{type:Boolean,default:false},
   userType: { type: String, enum: Object.values(UserType)},
   profile: {
-    fullname:{type:String},
+      fullname:{type:String},
       about: { type: String },
       location: { type: String },
       qualification: [{ course: String, institution: String, yearOfCompletion: Number }],
@@ -26,10 +26,7 @@ const UserSchema: Schema<IUser> = new Schema({
       resume: { type: String },
       gender: { type: String },
       dateOfBirth:{type:Date},
-      designation:{type:String},
-      
-    
-   
+      designation:{type:String}, 
   },
   companyProfile: {
    
