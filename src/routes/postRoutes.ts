@@ -1,11 +1,11 @@
 import express from 'express'
 import { addPost,getPost,editPost,getUserPost,deletePost,likePost} from '../controllers/postController';
 import { protect } from '../middlewares/auth';
-import { addComment, addReplyComment, getCommentsByPostId } from '../controllers/commentController';
+import { addComment, addReplyComment, deletePostComment, getCommentsByPostId } from '../controllers/commentController';
 
 
 const router = express.Router()
-
+router.get('/delete-post-comment', protect,deletePostComment);
 router.post('/add-post', protect,addPost);
 router.get('/get-post', protect,getPost);
 router.post('/edit-post', protect,editPost);

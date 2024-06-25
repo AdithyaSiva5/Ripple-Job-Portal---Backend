@@ -38,9 +38,7 @@ app.use((req, res, next) => {
 app.use(express.json())
 app.use(express.urlencoded({extended: true}))
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
-// const uploadDir = path.join(__dirname, 'public/uploads');
-// app.use('/uploads', express.static(uploadDir));
-// console.log(uploadDir)
+
 
 
 const sessionSecret = process.env.SESSION_SECRET || 'default_secret_key';

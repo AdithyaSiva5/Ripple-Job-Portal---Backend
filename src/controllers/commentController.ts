@@ -61,7 +61,6 @@ export const getCommentsByPostId = asyncHandler(async (req: Request, res: Respon
 // @route   POST /post/delete-comment
 // @access  Private
   export const deletePostComment = asyncHandler(async (req: Request, res: Response) => {
-    console.log("reaced deleted");
     const {commentId }= req.query;
     console.log(req.query);
     

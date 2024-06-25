@@ -6,9 +6,6 @@ import generateToken from "../utils/generateToken";
 import sendVerifyMail from "../utils/sendVerifyMail";
 import speakeasy from "speakeasy";
 import  { IUser, UserType } from '../models/user/userTypes';
-import { log } from "console";
-import Connections from "../models/connections/connectionModel";
-
 // @desc    Register new User
 // @route   USER /register
 // @access  Public
@@ -91,9 +88,7 @@ console.log(storedOTP);
     email: userDetails.email,
     password: userDetails.password,
   });
-  await Connections.create({
-    userId: user._id,
-  });
+
 
   delete sessionData.userDetails;
   delete sessionData.otp;
@@ -465,10 +460,9 @@ export const getUserDetails = asyncHandler(
     const { userId } = req.params;
   
     const user = await User.findById(userId);
-    const connections = await Connections.findOne({ userId:userId });
 
     if (user) {
-      res.status(200).json({ user, connections });
+      res.status(200).json({ user});
     } else {
       res.status(404);
       throw new Error(" user Not found");
