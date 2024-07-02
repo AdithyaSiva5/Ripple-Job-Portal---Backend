@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express'
-import { Login,getUsers,userBlock ,getPosts,postBlock,addJobCategory,getJobCategory,blockJobCategory, getJobs, jobBlock} from '../controllers/adminController';
+import { Login,getUsers,userBlock ,getPosts,postBlock,addJobCategory,getJobCategory,blockJobCategory, getJobs, jobBlock, getReportsController} from '../controllers/adminController';
 import { protectAdmin } from '../middlewares/adminAuth';
 const router = express.Router()
 
@@ -13,5 +13,7 @@ router.post('/job-block',protectAdmin,jobBlock);
 router.get('/job-category',protectAdmin,getJobCategory);
 router.post('/add-job-category',protectAdmin,addJobCategory);
 router.post('/block-job-category',protectAdmin,blockJobCategory);
+router.get('/get-reports',protectAdmin,getReportsController);
+
 
 export default router

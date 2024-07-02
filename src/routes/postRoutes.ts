@@ -1,5 +1,5 @@
 import express from 'express'
-import { addPost,getPost,editPost,getUserPost,deletePost,likePost} from '../controllers/postController';
+import { addPost,getPost,editPost,getUserPost,deletePost,likePost, reportPostController} from '../controllers/postController';
 import { protect } from '../middlewares/auth';
 import { addComment, addReplyComment, deletePostComment, getCommentsByPostId } from '../controllers/commentController';
 
@@ -14,6 +14,7 @@ router.post('/delete-post', protect,deletePost);
 router.post('/like-post', protect,likePost);
 router.post('/get-post-comments', protect,getCommentsByPostId);
 router.post('/add-comment',protect,addComment)
+router.post('/report-post',protect,reportPostController)
 router.post('/reply-comment',protect,addReplyComment)
 
 

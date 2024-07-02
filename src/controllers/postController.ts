@@ -1,6 +1,7 @@
 import Post from "../models/post/postModel";
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
+import Report from "../models/reports/reportModel";
 
 // @desc    Create new post
 // @route   POST /post/create-post
@@ -177,3 +178,36 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
 
   res.status(200).json({ posts });
 });
+
+// @desc   Post Report
+// @route   POST /post/Report-Post
+// @access  Public
+
+export const reportPostController = asyncHandler(async (req : Request , res : Response)=>{
+  const { userId , postId , cause} = req.body;
+  const existingReport = await Report.findOne({ userId, postId });
+  if(existingReport){
+    res.status(400);
+    throw new Error("You have already reported this post")
+  }
+  const report = new Report({
+    userId,
+    postId,
+    cause
+  })
+
+  await report.save();
+  
+  const reportCount = await Report.countDocuments({ postId })
+
+  const REPORT_THRESHOLD = 3;
+
+  if(reportCount >= REPORT_THRESHOLD){
+    await Post.findByIdAndUpdate(postId, {isBlocked: true})
+    res
+      .status(200)
+      .json({message : "Your Post has been blocked due to multiple reports"});
+    return;
+  }
+  res.status(200).json({message: "Post has been reported successfully"})
+})

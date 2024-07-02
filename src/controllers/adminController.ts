@@ -9,6 +9,9 @@ import bcrypt from "bcryptjs";
 import User from "../models/user/userModel";
 import JobCategory from "../models/jobCategory/jobCategoryModel";
 import Job from "../models/jobs/jobModel";
+import { populate } from "dotenv";
+import Report from "../models/reports/reportModel";
+
 
 
 
@@ -105,10 +108,10 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
 // @access  Public
 
 export const postBlock = asyncHandler(async (req: Request, res: Response) => {
+  console.log("HI")
   const postId = req.body.postId; 
- 
   const post = await Post.findById(postId)
-
+  console.log(postId)
   if (!post) {
     res.status(400);
     throw new Error('Post not found');
@@ -234,4 +237,38 @@ export const jobBlock = asyncHandler(async (req: Request, res: Response) => {
   const blocked = job.isAdminBlocked?"Blocked":"Unblocked"
 
   res.status(200).json({ jobs,message:`Job has been ${blocked}`});
+});
+
+  // @desc    Get all reports
+// @route   ADMIN /admin/get-posts
+// @access  Private
+
+export const getReportsController = asyncHandler(async (req: Request, res: Response) => {
+  const page: number = parseInt(req.query.page as string, 10) || 1;
+  const limit: number = 6;
+  const skip: number = (page - 1) * limit;
+
+  const totalPosts: number = await Post.countDocuments({ isDeleted: false });
+  const totalPages: number = Math.ceil(totalPosts / limit);
+
+  const reports = await Report.find()
+    .populate({
+      path: 'userId',
+      select: 'username profileImageUrl email'
+    })
+    .populate({
+      path: 'postId',
+      populate: {
+        path: 'userId',
+        select: 'username profileImageUrl email'
+      }
+    })
+    .skip(skip)
+    .limit(limit);
+
+  if (reports.length > 0) {
+    res.status(200).json({ reports, totalPages });
+  } else {
+    res.status(404).json({ message: "No Posts Found" });
+  }
 });
