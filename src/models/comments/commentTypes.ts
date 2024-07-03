@@ -1,10 +1,11 @@
 
 
-import { Schema, model, Document, Types } from 'mongoose';
+import { Schema, Document, Types } from 'mongoose';
+ 
 
 export interface ReplyCommentInterface {
   userId: Schema.Types.ObjectId | string;
-  replyComment : string;
+  replyComment: string;
   timestamp: Date;
 }
 
@@ -15,6 +16,6 @@ export interface CommentInterface extends Document {
   comment: string;
   isDeleted: boolean;
   timestamp: Date;
-  replyComments : ReplyCommentInterface[];
+  replyComments: ReplyCommentInterface[];
 }
 

@@ -6,9 +6,14 @@ import adminRoutes from "./routes/adminRoutes"
 import errorHandler from "./middlewares/errorMiddleware";
 import session, { SessionOptions,MemoryStore , SessionData} from "express-session"
 import jobRoutes from './routes/jobRoutes';
+import chatRoutes from './routes/chatRoutes'
+import connectionRoutes from './routes/connectionRoutes';
 import cors from 'cors'
 import postRoutes from './routes/postRoutes';
 import path from 'path'
+import { Server, Socket } from 'socket.io';
+import socketIo_Config from './utils/socket/socket';
+import http from 'http';
 
 
 
@@ -55,11 +60,25 @@ app.use('/api/',userRoutes)
 app.use('/api/admin',adminRoutes)
 app.use('/api/post',postRoutes)
 app.use('/api/job',jobRoutes);
+app.use('/api/connection',connectionRoutes);
+app.use('/api/chat',chatRoutes);
+
+
+// Create HTTP server
+const server = http.createServer(app);
+
+const io: Server = new Server(server, {
+  cors: { origin: '*' }
+});
+
+// Configure Socket.IO
+socketIo_Config(io);
+
 app.use(errorHandler)
 
 connectDB()
 const port = process.env.PORT || 3000
 
-app.listen(port , ()=>{
+server.listen(port , ()=>{
     console.log(`[server]: Server is running at http://localhost:${port}`)
 })

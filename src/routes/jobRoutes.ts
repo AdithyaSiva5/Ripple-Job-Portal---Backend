@@ -9,6 +9,7 @@ import { Request, Response, NextFunction } from 'express';
 import multer, { Multer } from 'multer'; 
 import path from 'path';
 import fs from 'fs';
+import { protect } from "../middlewares/auth";
 
 
 const router = express.Router();
@@ -43,15 +44,15 @@ router.use((err: any, req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-router.post('/add-job',addJob);
-router.post('/edit-job',editJob);
-router.post('/list-all-job',listActiveJobs);
-router.post('/list-user-job',listUserJobs)
-router.post('/job-details',jobDetails)
+router.post('/add-job',protect,addJob);
+router.post('/edit-job',protect,editJob);
+router.post('/list-all-job',protect,listActiveJobs);
+router.post('/list-user-job',protect,listUserJobs)
+router.post('/job-details',protect,jobDetails)
 router.post('/apply-job',upload.single('resume'),addJobApplication)
-router.post('/update-application-status',updateApplicationStatus)
-router.post('/get-applications-employee',employeeApplications)
-router.post('/get-applications-empolyer',employerApplications)
-router.post('/get-all-job-details',getAllJobDetails)
-router.post('/cancel-job-application',cancelJobApplication)
+router.post('/update-application-status',protect,updateApplicationStatus)
+router.post('/get-applications-employee',protect,employeeApplications)
+router.post('/get-applications-empolyer',protect,employerApplications)
+router.post('/get-all-job-details',protect,getAllJobDetails)
+router.post('/cancel-job-application',protect,cancelJobApplication)
 export default router;

@@ -11,13 +11,14 @@ import {
   updateUserTypeAndHiring,
   updateBasicInformation,
   getUserDetails,
-  updateUserRole
+  updateUserRole,
+  userSuggestions
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth";
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send("Ripple Job Portal");
 });
 
 router.post("/register", registerUser);
@@ -28,9 +29,10 @@ router.post("/google-auth", googleAuth);
 router.post("/forgot-password", forgotPassword);
 router.post("/forgot-otp", forgotOtp);
 router.post("/reset-password", resetPassword);
-router.post("/set-preferences", updateUserTypeAndHiring);
-router.post("/set-user-role", updateUserRole);
-router.post("/set-basic-information",updateBasicInformation);
-router.get('/user-details/:userId',getUserDetails);
+router.post("/set-preferences",protect, updateUserTypeAndHiring);
+router.post("/set-user-role",protect, updateUserRole);
+router.post("/set-basic-information",protect,updateBasicInformation);
+router.get('/user-details/:userId',protect,getUserDetails);
+router.post('/user-suggestions',protect,userSuggestions);
 
 export default router;

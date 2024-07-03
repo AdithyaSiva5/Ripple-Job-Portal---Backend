@@ -6,6 +6,7 @@ import generateToken from "../utils/generateToken";
 import sendVerifyMail from "../utils/sendVerifyMail";
 import speakeasy from "speakeasy";
 import  { IUser, UserType } from '../models/user/userTypes';
+import Connections from "../models/connections/connectionModel";
 // @desc    Register new User
 // @route   USER /register
 // @access  Public
@@ -451,7 +452,31 @@ export const updateBasicInformation = async (req: Request, res: Response) => {
 };
 
 
+export const userSuggestions = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { userId } = req.body;
 
+    const connection = await Connections.findOne({ userId });
+    if (!connection) {
+      const users = await User.find({ _id: { $ne: userId } });
+      res.status(200).json({ suggestedUsers:users });
+      return;
+    }
+    const followingIds = connection.connections.map((user:any) => user._id);
+    const requestedIds = connection.requestSent.map((user:any) => user._id);
+
+    const suggestedUsers = await User.find(
+      {
+        _id: { $nin: [...followingIds, ...requestedIds, userId] }
+      },
+      { password: 0 }
+    );
+    
+    res
+      .status(200)
+      .json({  suggestedUsers });
+  }
+);
 
 
 
