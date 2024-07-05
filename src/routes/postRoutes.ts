@@ -10,7 +10,7 @@ router.post('/add-post', protect,addPost);
 router.get('/get-post', protect,getPost);
 router.post('/edit-post', protect,editPost);
 router.post('/get-user-post', protect,getUserPost);
-router.post('/delete-post', protect,deletePost);
+router.post('/delete-post', protect,deletePost); 
 router.post('/like-post', protect,likePost);
 router.post('/get-post-comments', protect,getCommentsByPostId);
 router.post('/add-comment',protect,addComment)

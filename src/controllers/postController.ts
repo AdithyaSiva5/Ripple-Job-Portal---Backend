@@ -74,7 +74,7 @@ export const getUserPost = asyncHandler(async (req: Request, res: Response) => {
   
   const id = req.body.userId;
   console.log(id);
- 
+  
   
 
   const posts = await Post.find({userId:id, isBlocked: false, isDeleted:false  }).populate({

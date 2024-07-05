@@ -19,4 +19,4 @@ router.post('/reject-request',protect,rejectRequest);
 router.post('/get-requested-users',protect,getFollowRequests);
 router.post('/get-connection',protect,getConnection); 
 router.post('/cancel-request',protect,cancelFollowRequest);
-export default router;
+export default router; 

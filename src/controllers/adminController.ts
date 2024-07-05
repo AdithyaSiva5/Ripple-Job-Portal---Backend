@@ -108,7 +108,6 @@ export const getPosts = asyncHandler(async (req: Request, res: Response) => {
 // @access  Public
 
 export const postBlock = asyncHandler(async (req: Request, res: Response) => {
-  console.log("HI")
   const postId = req.body.postId; 
   const post = await Post.findById(postId)
   console.log(postId)
