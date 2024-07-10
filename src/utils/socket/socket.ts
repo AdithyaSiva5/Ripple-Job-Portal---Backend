@@ -107,32 +107,7 @@ const socketIo_Config = (io: any) => {
           io.to(group_id).emit("responseGroupMessage", emitData);
         }
       });
-      socket.on("videoCallRequest", (data: any) => {
-        const emitdata = {
-          roomId: data.roomId,
-          senderName:data.senderName,
-          senderProfile:data.senderProfile
-        };
-        console.log(emitdata)
-        const user = getUser(data.recieverId);
-        if(user){
-          io.to(user.socketId).emit("videoCallResponse", emitdata);
-        }
-      });
-  
-  
-      //Group Video Call 
-  
-      socket.on("GroupVideoCallRequest",(data:any)=>{
-  
-        const emitdata={
-          roomId:data.roomId,
-          groupName:data.groupName,
-          groupProfile:data.groupProfile
-        }
-        
-          io.to(data.groupId).emit("GroupVideoCallResponse",emitdata)
-        })
+     
         
   
       // When disconnectec

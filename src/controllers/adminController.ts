@@ -268,6 +268,6 @@ export const getReportsController = asyncHandler(async (req: Request, res: Respo
   if (reports.length > 0) {
     res.status(200).json({ reports, totalPages });
   } else {
-    res.status(404).json({ message: "No Posts Found" });
+    res.status(404).json({ message: "No Data Found" });
   }
 });

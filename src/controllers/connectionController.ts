@@ -7,8 +7,6 @@ import User from "../models/user/userModel";
 
 export const getConnection = asyncHandler(
   async (req: Request, res: Response) => {
-    console.log("Hi")
-
     const { userId } = req.body;
     const connection =await Connections.findOne({ userId }).populate('connections')
     .populate('requested')
