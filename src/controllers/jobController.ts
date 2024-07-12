@@ -4,17 +4,13 @@ import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 import User from "../models/user/userModel";
 import JobApplication from '../models/jobApplication/jobApplicationModel'; 
-
-
+import mongoose from "mongoose";
 
 
 //add Job
 
 export const addJob =  asyncHandler(async (req: Request, res: Response): Promise<void> => {
-  try {
-
-    
-    
+  try {    
     const {
       userId,
       companyName,
@@ -43,10 +39,7 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
       qualification,
       isDeleted: false, 
     });
-
-  
     await newJob.save();
-
     res.status(201).json({ message: 'Job added successfully', job: newJob });
   } catch (error) {
     console.error('Error adding job:', error);
@@ -57,9 +50,6 @@ export const addJob =  asyncHandler(async (req: Request, res: Response): Promise
 
 //editjob
 export const editJob = asyncHandler(async (req: Request, res: Response): Promise<void> => {
- console.log("here bitch");
- 
- 
   try {
     const {
       jobId,
@@ -109,13 +99,50 @@ export const editJob = asyncHandler(async (req: Request, res: Response): Promise
 
 export const listActiveJobs = async (req: Request, res: Response): Promise<void> => {
   try {
-  
+    const { userId, filterData } = req.body;
+    const searchText = filterData?.search || ''; 
+    const userApplications: mongoose.Types.ObjectId[] = await JobApplication.find({
+      applicantId: userId,
+      isDeleted: { $ne: true },
+      
+    }).distinct('jobId');
+    const filterCriteria: any = {
+      isDeleted: { $ne: true },
+      userId: { $ne: userId },
+      isAdminBlocked: false,
+      isBlocked:false,
+      _id: { $nin: userApplications },
+    };
 
-    const jobs: IJob[] = await Job.find({ isDeleted: { $ne: true } }).populate({
-      path: 'userId',
-      select: 'username profileImageUrl',
-    });
+    if (filterData) {
+      if (filterData.jobRole) {
+        filterCriteria.jobRole = filterData.jobRole;
+      }
+      if (filterData.location) {
+        filterCriteria.jobLocation = filterData.location;
+      }
+      if (filterData.jobType) {
+        filterCriteria.jobType = filterData.jobType;
+      }
+      if (filterData.salaryRange && filterData.salaryRange != 0) {
+      
 
+        const maxSalary = parseFloat(filterData.salaryRange);
+        filterCriteria.salary = { $lte: maxSalary };
+      }
+      if (filterData.experienceRange && filterData.experienceRange != 0) {
+        
+        const maxExp = parseFloat(filterData.experienceRange);
+        filterCriteria.experience = { $lte: maxExp };
+      }
+
+      if (searchText.trim() !== ''&& searchText!==null) {
+        filterCriteria.jobRole = { $regex: searchText.trim(), $options: 'i' };
+      }
+    }
+
+    const jobs: IJob[] = await Job.find(filterCriteria)
+      .populate({ path: 'userId', select: 'username profileImageUrl' });
     res.status(200).json({ jobs });
   } catch (error) {
     console.error('Error listing active jobs:', error);
@@ -253,21 +280,42 @@ export const employeeApplications = async (req: Request, res: Response): Promise
   }
 };
 
+//viewjob
+export const viewJob = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { jobId } = req.body;
+
+    // Get job details
+    const job = await Job.findOne({ _id: jobId, isDeleted: { $ne: true } })
+      .populate({
+        path: 'userId',
+        select: 'username profileImageUrl',
+      })
+      .exec();
+
+    // Get job applications
+    const applications = await JobApplication.find({ jobId,
+      isDeleted: { $ne: true }}) .populate('applicantId').populate('jobId')
+      .exec();
+
+    res.status(200).json({ success: true, job, applications });
+  } catch (error) {
+    console.error('Error fetching job and applications:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+
 
 
 //get employeer applications
 export const employerApplications = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log("reached employerApplications");
     const { userId } = req.body;
     const jobs = await Job.find({ userId });
     const jobIds = jobs.map((job) => job._id);
 
-    const applications = await JobApplication.find({ jobId: { $in: jobIds } })
-      .populate({
-        path: 'applicantId',
-        select: 'username profileImageUrl profile.fullname profile.designation',
-      })
+    const applications = await JobApplication.find({ jobId: { $in: jobIds } }) .populate('applicantId').populate('jobId')
       .exec();
 
     res.status(200).json({ success: true, applications });
@@ -279,7 +327,6 @@ export const employerApplications = async (req: Request, res: Response): Promise
 
 //get all job details
 export const getAllJobDetails = async (req: Request, res: Response): Promise<void> => {
-  console.log("reached getAllJobDetails");
 
   try {
     const { jobId } = req.body;
@@ -307,11 +354,9 @@ export const getAllJobDetails = async (req: Request, res: Response): Promise<voi
 
 //cancel job application request
 export const cancelJobApplication = async (req: Request, res: Response): Promise<void> => {
-  console.log("reached cancelJobApplication");
  
   try {
     const { applicationId } = req.body;
-
     const jobApplication = await JobApplication.findByIdAndUpdate(
       applicationId,
       { isCanceled: true },
@@ -327,5 +372,42 @@ export const cancelJobApplication = async (req: Request, res: Response): Promise
   } catch (error) {
     console.error('Error canceling job application:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+// @desc    Block job
+// @route   USER /user/block-user
+// @access  Private
+
+export const userJobBlock = asyncHandler(async (req: Request, res: Response) => {
+  const jobId = req.body.jobId; 
+  const job = await Job.findById(jobId)
+  if (!job) {
+    res.status(400);
+    throw new Error('Post not found');
+  }
+  const userId=job?.userId
+
+  job.isBlocked = !job.isBlocked;
+  await job.save();
+
+  const jobs: IJob[] = await Job.find({ userId: userId, isDeleted: { $ne: true }})
+  .populate('userId')
+  .exec();
+ 
+  const blocked = job.isAdminBlocked?"Blocked":"Unblocked"
+
+  res.status(200).json({ jobs,message:`Job has been ${blocked}`});
+});
+
+export const getFormSelectData = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const distinctLocations= await Job.distinct('jobLocation').sort();
+    const distinctRoles = await Job.distinct('jobRole').sort();
+
+    res.status(200).json({ locations: distinctLocations, roles: distinctRoles });
+  } catch (error) {
+    console.error('Error fetching distinct job data:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

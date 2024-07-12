@@ -1,8 +1,10 @@
 import express from "express";
 import {
-addJob, addJobApplication, cancelJobApplication, editJob, employeeApplications, employerApplications, getAllJobDetails, jobDetails, listActiveJobs,
+addJob, addJobApplication, cancelJobApplication, editJob, employeeApplications, employerApplications, getAllJobDetails, getFormSelectData, jobDetails, listActiveJobs,
 listUserJobs,
-updateApplicationStatus
+updateApplicationStatus,
+userJobBlock,
+viewJob
 } from "../controllers/jobController";
 import { Request, Response, NextFunction } from 'express';
 
@@ -46,7 +48,8 @@ router.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 router.post('/add-job',protect,addJob);
 router.post('/edit-job',protect,editJob);
-router.post('/list-all-job',protect,listActiveJobs);
+router.post('/view-job',protect,viewJob);
+router.post('/list-all-job',protect,listActiveJobs); 
 router.post('/list-user-job',protect,listUserJobs)
 router.post('/job-details',protect,jobDetails)
 router.post('/apply-job',upload.single('resume'),addJobApplication)
@@ -54,5 +57,9 @@ router.post('/update-application-status',protect,updateApplicationStatus)
 router.post('/get-applications-employee',protect,employeeApplications)
 router.post('/get-applications-empolyer',protect,employerApplications)
 router.post('/get-all-job-details',protect,getAllJobDetails)
-router.post('/cancel-job-application',protect,cancelJobApplication)
+router.get('/form-select-data',protect,getFormSelectData)
+router.post('/block-job',userJobBlock);
+router.patch('/cancel-job-application',protect,cancelJobApplication)
+
+
 export default router;
