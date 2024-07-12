@@ -14,7 +14,7 @@ const jobApplicationSchema = new Schema<jobApplicationInterface>({
     },
     applicationStatus:{
         type: String,
-        required: true,
+        required: true, 
         default:"Pending"
     },
    isDeleted:{

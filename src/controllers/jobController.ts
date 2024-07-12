@@ -111,7 +111,7 @@ export const listActiveJobs = async (req: Request, res: Response): Promise<void>
       userId: { $ne: userId },
       isAdminBlocked: false,
       isBlocked:false,
-      _id: { $nin: userApplications },
+      // _id: { $nin: userApplications },
     };
 
     if (filterData) {
@@ -145,7 +145,6 @@ export const listActiveJobs = async (req: Request, res: Response): Promise<void>
       .populate({ path: 'userId', select: 'username profileImageUrl' });
     res.status(200).json({ jobs });
   } catch (error) {
-    console.error('Error listing active jobs:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -194,9 +193,6 @@ export const jobDetails = async (req: Request, res: Response): Promise<void> => 
 
 //add job application
 export const addJobApplication = async (req: Request, res: Response): Promise<void> => {
-  console.log("reached addJobApplication ");
-  console.log(req.body); 
-  console.log(req.file);  
   try {
     const {
       applicantId,
@@ -209,6 +205,17 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
 
     if (!resume) {
       res.status(400).json({ message: 'No Resume uploaded' });
+      return;
+    }
+
+
+    const existingApplication = await JobApplication.findOne({
+      applicantId,
+      jobId,
+    });
+
+    if (existingApplication) {
+      res.status(400).json({ message: 'You have already applied for this job' });
       return;
     }
 
