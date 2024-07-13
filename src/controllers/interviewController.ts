@@ -87,7 +87,6 @@ export const editInterview = async (req: Request, res: Response): Promise<void> 
   try {
     const { id } = req.body; 
     const {
-
       jury,
       interviewDate,
       interviewTime,
@@ -118,10 +117,7 @@ export const editInterview = async (req: Request, res: Response): Promise<void> 
 // Controller function to change the status of an interview
 export const setInterviewStatus = async (req: Request, res: Response): Promise<void> => {
     try {
-
-      const { status ,interviewId} = req.body;
-  console.log(req.body);
-  
+      const { status ,interviewId} = req.body;  
 
       const existingInterview = await Interview.findById(interviewId);
       if (!existingInterview) {
@@ -183,9 +179,6 @@ export const setInterviewStatus = async (req: Request, res: Response): Promise<v
 
       const interviews = await Interview.find({ jobId }).populate('interviewerId')
       .populate( 'intervieweeId').populate('jobId')
-  
-  
-  
       res.status(200).json({ interviews });
     } catch (error) {
       console.error('Error fetching interviews:', error);

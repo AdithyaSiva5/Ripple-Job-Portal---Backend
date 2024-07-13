@@ -30,7 +30,10 @@ const jobApplicationSchema = new Schema<jobApplicationInterface>({
         type: String,
         required: true
     },
- 
+    isInterviewScheduled:{
+        type:Boolean,
+        default:false
+    }
     
 },{timestamps:true});
 

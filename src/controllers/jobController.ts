@@ -231,7 +231,7 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
 
     await User.updateOne({ _id: applicantId }, { $inc: { dailyJobsApplied: 1 } });
 
-    res.status(201).json({ message: 'Job application submitted ', jobApplication: newJobApplication });
+    res.status(201).json({success:true, message: 'Job application submitted ', jobApplication: newJobApplication });
   } catch (error) {
     console.error('Error adding job application:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -242,8 +242,11 @@ export const updateApplicationStatus = async (req: Request, res: Response): Prom
   console.log("reached updateApplicationStatus ");
   
   try {
-    const { applicationId,status } = req.body; 
-    const jobApplication = await JobApplication.findById(applicationId);
+    const { applicationId,status,userId } = req.body; 
+    const jobApplication = await JobApplication.findById(applicationId).populate({
+      path:'jobId',
+      select:'userId'
+    });
 
     if (!jobApplication) {
       res.status(404).json({ message: 'Job application not found' });
@@ -251,10 +254,24 @@ export const updateApplicationStatus = async (req: Request, res: Response): Prom
     }
 
     jobApplication.applicationStatus = status;
-
     await jobApplication.save();
+    const jobs = await Job.find({ userId });
+    const job = await Job.findOne({_id:jobApplication.jobId})
+    const jobIds = jobs.map((job) => job._id);
+    const applications = await JobApplication.find({ jobId: { $in: jobIds }})
+    .populate({
+      path: 'applicantId',
+      select: 'username profileImageUrl profile.fullname profile.designation companyProfile.companyName',
+    })
+    .populate('jobId')
+    .exec();
 
-    res.status(200).json({ message: `Job application ${status} successfully`, jobApplication });
+    const jobSpecificApplications = await JobApplication.find({ jobId:jobApplication.jobId }) .populate('applicantId').populate('jobId')
+    .exec();
+
+    
+
+    res.status(200).json({ message: `Job application ${status} successfully`, applications,jobSpecificApplications });
   } catch (error) {
     console.error('Error accepting job application:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -291,7 +308,6 @@ export const employeeApplications = async (req: Request, res: Response): Promise
 export const viewJob = async (req: Request, res: Response): Promise<void> => {
   try {
     const { jobId } = req.body;
-
     // Get job details
     const job = await Job.findOne({ _id: jobId, isDeleted: { $ne: true } })
       .populate({
@@ -304,7 +320,6 @@ export const viewJob = async (req: Request, res: Response): Promise<void> => {
     const applications = await JobApplication.find({ jobId,
       isDeleted: { $ne: true }}) .populate('applicantId').populate('jobId')
       .exec();
-
     res.status(200).json({ success: true, job, applications });
   } catch (error) {
     console.error('Error fetching job and applications:', error);

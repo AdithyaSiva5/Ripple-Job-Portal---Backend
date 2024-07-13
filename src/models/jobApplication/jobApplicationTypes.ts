@@ -8,6 +8,7 @@ interface  jobApplicationInterface extends Document {
     resume: string;
     isDeleted:boolean;
     timestamp: Date;
+    isInterviewScheduled:boolean;
 }
 
 export default jobApplicationInterface;
