@@ -50,6 +50,10 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
 // @access  Public
 
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = 2; 
+  const skip = (page - 1) * limit;
+
   const posts = await Post.find({ isBlocked: false, isDeleted: false })
     .populate({
       path: 'userId',
@@ -59,10 +63,15 @@ export const getPost = asyncHandler(async (req: Request, res: Response) => {
       path: 'likes',
       select: 'username profileImageUrl'
     })
-    .sort({ date: -1 });
+    .sort({ date: -1 })
+    .skip(skip)
+    .limit(limit);
 
-  res.status(200).json(posts);
-});
+    const totalPosts = await Post.countDocuments({ isBlocked: false, isDeleted: false });
+    const hasMore = totalPosts > skip + posts.length;
+
+  res.status(200).json({posts , hasMore } );
+}); 
 
 
 
