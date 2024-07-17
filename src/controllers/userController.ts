@@ -70,6 +70,7 @@ console.log(storedOTP);
   if (!storedOTP || otp !== storedOTP) {
     res.status(400);
     throw new Error("Invalid OTP");
+    
   }
   const otpGeneratedTime = sessionData.otpGeneratedTime || 0;
   const currentTime = Date.now();
@@ -133,18 +134,13 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
   console.log(req.body);
-  
   const user = await User.findOne({ email });
-
-  
-  
   if (user) {
     if (user.isBlocked) {
       res.status(400);
       throw new Error("User is blocked");
     }
   }
-
   if (user && (await bcrypt.compare(password, user.password))) {
 
     const userData= await User.findOne({email},{password:0})
@@ -494,3 +490,4 @@ export const getUserDetails = asyncHandler(
     }
   }
 );
+

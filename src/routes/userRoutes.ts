@@ -15,6 +15,8 @@ import {
   userSuggestions
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth";
+import { getPremiumUserData, initiatecheckout, validatePayment } from "../controllers/checkoutController";
+import { getNotifications } from "../controllers/notificationController";
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {
@@ -34,5 +36,9 @@ router.post("/set-user-role",protect, updateUserRole);
 router.post("/set-basic-information",updateBasicInformation);
 router.get('/user-details/:userId',protect,getUserDetails);
 router.post('/user-suggestions',protect,userSuggestions);
+router.post("/checkout-user",protect, initiatecheckout);
+router.post("/validate-payment",protect,validatePayment);
+router.post("/get-transactions",protect,getPremiumUserData);
+router.post("/get-notifications",protect,getNotifications )
 
 export default router;

@@ -2,6 +2,8 @@ import Post from "../models/post/postModel";
 import { Request, Response } from "express";
 import asyncHandler from "express-async-handler";
 import Report from "../models/reports/reportModel";
+import { createNotification } from "../utils/notificationSetter";
+import Notification from "../models/notifications/notificationsModel";
 
 // @desc    Create new post
 // @route   POST /post/create-post
@@ -165,7 +167,19 @@ export const likePost = asyncHandler(async (req: Request, res: Response) => {
   if (isLiked) {
   
     await Post.findOneAndUpdate({_id: postId}, {$pull: {likes: userId}}, {new: true})
+    await Notification.findOneAndDelete({senderId:userId,receiverId:post.userId,message:'liked your post'})
+
   } else {
+    const notificationData = {
+      senderId:userId,
+      receiverId: post.userId,
+      message: 'liked your post',
+      link: `/visit-profile/posts/${post.userId}`, 
+      read: false, 
+      postId:postId
+    };
+
+    createNotification(notificationData)
  
     await Post.findOneAndUpdate({_id: postId}, {$push: {likes: userId }}, {new: true})
   }

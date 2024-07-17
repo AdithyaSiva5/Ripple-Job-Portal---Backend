@@ -56,7 +56,10 @@ export interface IUser extends Document {
   isBlocked: boolean;
   isGoogle:boolean;
   isFacebook:boolean;
+  isPremium:boolean;
   isOnline: boolean;
+  dailyJobsApplied:number;
+  premiumExpiryDate:Date;
   userType: UserType;
   profile: Profile;
   companyProfile: CompanyProfile;

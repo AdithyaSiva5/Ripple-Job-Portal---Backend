@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 import User from "../models/user/userModel";
 import JobApplication from '../models/jobApplication/jobApplicationModel'; 
 import mongoose from "mongoose";
+import { createNotification } from "../utils/notificationSetter";
 
 
 //add Job
@@ -228,6 +229,18 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
     });
 
     await newJobApplication.save();
+    const job = await Job.findOne({_id:jobId})
+    const notificationData = {
+      senderId:applicantId,
+      receiverId: job?.userId,
+      message: `applied for the postion of ${job?.jobRole} at ${job?.companyName} `,
+      link: `/visit-profile/posts/`, 
+      read: false, 
+      jobId:jobId
+   
+    };
+
+    createNotification(notificationData)
 
     await User.updateOne({ _id: applicantId }, { $inc: { dailyJobsApplied: 1 } });
 
@@ -239,7 +252,6 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
 };
 //update application status
 export const updateApplicationStatus = async (req: Request, res: Response): Promise<void> => {
-  console.log("reached updateApplicationStatus ");
   
   try {
     const { applicationId,status,userId } = req.body; 
@@ -269,6 +281,32 @@ export const updateApplicationStatus = async (req: Request, res: Response): Prom
     const jobSpecificApplications = await JobApplication.find({ jobId:jobApplication.jobId }) .populate('applicantId').populate('jobId')
     .exec();
 
+    if(status=="Accepted"){
+        
+      const notificationData = {
+        senderId:userId,
+        receiverId: jobApplication.applicantId,
+        message: 'accepted your job application',
+        link: `/visit-profile/posts/`, 
+        read: false, 
+        applicationId:applicationId
+     
+      };
+  
+      createNotification(notificationData)
+        }else{
+          const notificationData = {
+            senderId:userId,
+            receiverId:  jobApplication.applicantId,
+            message: 'rejected your job application',
+            link: `/visit-profile/posts/`, 
+            read: false, 
+            applicationId:applicationId
+         
+          };
+      
+          createNotification(notificationData)
+        }
     
 
     res.status(200).json({ message: `Job application ${status} successfully`, applications,jobSpecificApplications });

@@ -11,6 +11,7 @@ import JobCategory from "../models/jobCategory/jobCategoryModel";
 import Job from "../models/jobs/jobModel";
 import { populate } from "dotenv";
 import Report from "../models/reports/reportModel";
+import PremiumUsers from "../models/premium/premiumModel";
 
 
 
@@ -269,5 +270,32 @@ export const getReportsController = asyncHandler(async (req: Request, res: Respo
     res.status(200).json({ reports, totalPages });
   } else {
     res.status(404).json({ message: "No Data Found" });
+  }
+});
+
+// @desc    get Transactions
+// @route   ADMIN /admin/transactions
+// @access  Public
+  
+export const getTransactionsController = asyncHandler(async (req: Request, res: Response) => {
+  const page: number = parseInt(req.query.page as string, 10) || 1;
+  const limit: number = 6;
+  const skip: number = (page - 1) * limit;
+
+
+  const totalTransactions: number = await PremiumUsers.countDocuments({});
+  const totalPages: number = Math.ceil(totalTransactions/ limit);
+
+  const transactions = await PremiumUsers.find()  
+.populate({
+  path: "userId",
+  select: "username profileImageUrl email isPremium",
+}).skip(skip).limit(limit);
+
+
+  if ( transactions.length > 0) {
+    res.status(200).json({ transactions, totalPages });
+  } else {
+    res.status(404).json({ message: "Transactions Not Found" });
   }
 });

@@ -14,6 +14,7 @@ import path from 'path'
 import { Server, Socket } from 'socket.io';
 import socketIo_Config from './utils/socket/socket';
 import http from 'http';
+import runScheduledTask from './utils/scheduledTask';
 
 
 
@@ -62,6 +63,8 @@ app.use('/api/post',postRoutes)
 app.use('/api/job',jobRoutes);
 app.use('/api/connection',connectionRoutes);
 app.use('/api/chat',chatRoutes);
+
+runScheduledTask();
 
 
 // Create HTTP server

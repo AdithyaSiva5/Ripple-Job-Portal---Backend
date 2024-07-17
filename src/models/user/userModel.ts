@@ -15,6 +15,9 @@ const UserSchema: Schema<IUser> = new Schema({
   isOnline: { type: Boolean, default: false },
   isGoogle:{type:Boolean,default:false},
   isFacebook:{type:Boolean,default:false},
+  isPremium:{type:Boolean,default:false},
+  dailyJobsApplied:{type:Number,default:0},
+  premiumExpiryDate:{type:Date,required:false},
   userType: { type: String, enum: Object.values(UserType)},
   profile: {
       fullname:{type:String},
@@ -42,7 +45,7 @@ const UserSchema: Schema<IUser> = new Schema({
   savedPosts: [{ type: mongoose.Types.ObjectId, ref: 'Post' }],
   savedJobs: [{ type: mongoose.Types.ObjectId, ref: 'Job' }],
   isActive: { type: Boolean, default: true },
-  profileImageUrl: { type: String ,default:'https://i.postimg.cc/CxTwsVFy/default-user-profile.png'},
+  profileImageUrl: { type: String ,default:'https://i.postimg.cc/8z7vvppS/default-user-profile.png'},
   
 },{timestamps:true});
 
