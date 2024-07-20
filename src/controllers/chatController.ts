@@ -134,7 +134,10 @@ export const getMessagesController = asyncHandler(async (req: Request, res: Resp
 export const setMessageReadController = asyncHandler(
   async (req: Request, res: Response) => {
     try {
-      const { conversationId, userId } = req.body;
+      console.log("Hii")
+      const { conversationId, userId } = req.body; 
+      console.log("Conversation ID:", conversationId);
+      console.log("User ID:", userId);
       console.log(conversationId, userId + "Reading Messages");
       const messages = await Message.updateMany(
         { conversationId: conversationId, sender: { $ne: userId } },
