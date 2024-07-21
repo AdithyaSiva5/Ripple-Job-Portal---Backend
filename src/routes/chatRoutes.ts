@@ -20,8 +20,8 @@ router.get("/find-conversation/:firstUserId/:secondUserId",protect,findConversat
 // Messages Routes
 
 router.post('/add-message',protect,addMessageController);
-router.get('/get-messages/:conversationId',protect,getMessagesController)
-router.patch('/set-message-read',protect,setMessageReadController);
+router.get('/get-messages/:conversationId',protect,getMessagesController) 
+router.post('/set-message-read',protect,setMessageReadController);
 router.post('/get-unread-messages',protect,getUnreadMessagesController)
 
 export default router;

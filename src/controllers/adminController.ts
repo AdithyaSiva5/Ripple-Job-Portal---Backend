@@ -299,3 +299,86 @@ export const getTransactionsController = asyncHandler(async (req: Request, res: 
     res.status(404).json({ message: "Transactions Not Found" });
   }
 });
+
+// @desc    Chart Data
+// @route   ADMIN /admin/chart-data
+// @access  Public
+
+export const chartDataController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const userJoinStats = await User.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          userCount: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    const postCreationStats = await Post.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$date" } },
+          postCount: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    const jobCreationStats = await Job.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          jobCount: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+    ]);
+
+    const chartData = {
+      userJoinStats,
+      postCreationStats,
+      jobCreationStats,
+    };
+
+    res.json(chartData);
+  }
+);
+
+
+// @desc    Dashboard Stats
+// @route   ADMIN /admin/dashboard-stats
+// @access  Public
+
+export const dashboardStatsController = asyncHandler(
+  async (req: Request, res: Response) => {
+    const totalUsers = await User.countDocuments();
+
+    const totalPosts = await Post.countDocuments();
+
+    const totalJobs  = await Job.countDocuments();
+
+    const totalSales = await PremiumUsers.countDocuments();
+
+    const totalJobsCategories = await JobCategory.countDocuments();
+    const totalReports = await Report.countDocuments();
+    const stats = {
+      totalUsers,
+      totalPosts,
+      totalJobs,
+      totalSales,
+      totalJobsCategories,
+      totalReports,
+    };
+
+
+    res.status(200).json(stats);
+  }
+);

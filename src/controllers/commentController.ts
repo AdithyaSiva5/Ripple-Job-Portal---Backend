@@ -104,7 +104,7 @@ export const getCommentsByPostId = asyncHandler(async (req: Request, res: Respon
 
   // @desc    reply comment
 // @route   POST /post/reply-comment
-// @access  Private
+// @access  Private 
 export const addReplyComment = asyncHandler(async (req, res) => {
   console.log("reached replu");
   
@@ -120,7 +120,7 @@ export const addReplyComment = asyncHandler(async (req, res) => {
   const newReplyComment = {
     userId,
     replyComment,
-    timestamp: new Date(),
+    timestamp: new Date(), 
   };
 
   comment.replyComments.push(newReplyComment);
