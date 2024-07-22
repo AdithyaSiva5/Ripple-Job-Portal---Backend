@@ -17,6 +17,7 @@ import {
 import { protect } from "../middlewares/auth";
 import { getPremiumUserData, initiatecheckout, validatePayment } from "../controllers/checkoutController";
 import { getNotifications } from "../controllers/notificationController";
+import { searchAllCollections } from "../controllers/searchController";
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {
@@ -40,5 +41,8 @@ router.post("/checkout-user",protect, initiatecheckout);
 router.post("/validate-payment",protect,validatePayment);
 router.post("/get-transactions",protect,getPremiumUserData);
 router.post("/get-notifications",protect,getNotifications )
+router.get("/search",protect,searchAllCollections)
+
+
 
 export default router;

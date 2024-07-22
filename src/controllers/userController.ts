@@ -7,6 +7,8 @@ import sendVerifyMail from "../utils/sendVerifyMail";
 import speakeasy from "speakeasy";
 import { IUser, UserType } from "../models/user/userTypes";
 import Connections from "../models/connections/connectionModel";
+import jwt from "jsonwebtoken";
+
 // @desc    Register new User
 // @route   USER /register
 // @access  Public
@@ -471,3 +473,5 @@ export const getUserDetails = asyncHandler(
     }
   }
 );
+
+
