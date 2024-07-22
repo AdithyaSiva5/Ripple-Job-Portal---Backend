@@ -12,7 +12,9 @@ import {
   updateBasicInformation,
   getUserDetails,
   updateUserRole,
-  userSuggestions
+  userSuggestions,
+  getSettings,
+  updateSettings
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth";
 import { getPremiumUserData, initiatecheckout, validatePayment } from "../controllers/checkoutController";
@@ -42,6 +44,8 @@ router.post("/validate-payment",protect,validatePayment);
 router.post("/get-transactions",protect,getPremiumUserData);
 router.post("/get-notifications",protect,getNotifications )
 router.get("/search",protect,searchAllCollections)
+router.get('/settings',protect, getSettings);
+router.put('/settings',protect, updateSettings);
 
 
 
