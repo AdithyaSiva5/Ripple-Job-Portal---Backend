@@ -26,7 +26,7 @@ const UserSchema: Schema<IUser> = new Schema({
       qualification: [{ course: String, institution: String, yearOfCompletion: Number }],
       experience: [{ jobPosition: String, yearOfJoining: Number, companyName: String }],
       skills: [{ type: String }],
-      resume: { type: String },
+      resume: { type: String },  
       gender: { type: String },
       dateOfBirth:{type:Date},
       designation:{type:String}, 

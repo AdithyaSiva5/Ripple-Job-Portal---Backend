@@ -352,11 +352,12 @@ export const updateUserInformation = async (req: Request, res: Response) => {
 
 export const updateUserRole = async (req: Request, res: Response) => {
   try {
-    const { userId, isHiring } = req.body;
+    const { userId, userType, isHiring } = req.body;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
+    user.userType = userType as UserType;
     user.isHiring = isHiring;
     await user.save();
     res.status(200).json({ message: "User updated successfully", user });
@@ -470,7 +471,7 @@ export const getUserDetails = asyncHandler(
     } else {
       res.status(404);
       throw new Error(" user Not found");
-    }
+    } 
   }
 );
 
@@ -485,9 +486,11 @@ export const getSettings = async (req: Request, res: Response) => {
     }
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' });  
   }
 };
+
+
 
 export const updateSettings = async (req: Request, res: Response) => {
   try {

@@ -44,8 +44,8 @@ router.post("/validate-payment",protect,validatePayment);
 router.post("/get-transactions",protect,getPremiumUserData);
 router.post("/get-notifications",protect,getNotifications )
 router.get("/search",protect,searchAllCollections)
-router.get('/settings',protect, getSettings);
-router.put('/settings',protect, updateSettings);
+router.post('/settings',protect, getSettings); 
+router.post('/settings',protect, updateSettings);
 
 
 
