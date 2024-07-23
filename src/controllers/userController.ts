@@ -476,26 +476,20 @@ export const getUserDetails = asyncHandler(
 export const getSettings = async (req: RequestWithToken, res: Response) => {
   try {
     const userId = req.user._id;
-    console.log("Getting settings for user:", userId);
 
     const user = await User.findById(userId);
     if (!user) {
-      console.log("User not found");
       return res.status(404).json({ message: "User not found" });
     }
     const jobCategories = await JobCategory.find({ isBlocked: false });
-    console.log("Fetched job categories:", jobCategories);
-
-
     const responseData = {
       user,
-      jobCategories: jobCategories.map(category => ({
+      jobCategories: jobCategories.map((category) => ({
         id: category._id,
-        name: category.jobCategory
-      }))
+        name: category.jobCategory,
+      })),
     };
-
-    console.log("Sending response data:", responseData);
+    console.log("Sending response data:", responseData.user.profile);
     res.json(responseData);
   } catch (error) {
     console.error("Error in getSettings:", error);
@@ -532,7 +526,7 @@ export const updateSettings = async (req: RequestWithToken, res: Response) => {
       user.profile.gender = updates.gender;
     }
 
-    console.log("Updated user object:", user);
+    console.log("Updated user object:", user.profile);
 
     await user.save();
     console.log("User saved successfully");
