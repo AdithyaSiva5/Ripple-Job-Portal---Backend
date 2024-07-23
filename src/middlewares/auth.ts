@@ -2,11 +2,8 @@ import jwt from "jsonwebtoken";
 import asyncHandler from "express-async-handler";
 import { Request, Response, NextFunction } from "express";
 import User from "../models/user/userModel";
+import { RequestWithToken } from "./RequestWithToken";
 
-interface RequestWithToken extends Request {
-  token?: string;
-  user?: any;
-}
 
 const protect = asyncHandler(
   async (req: RequestWithToken, res: Response, next: NextFunction) => {

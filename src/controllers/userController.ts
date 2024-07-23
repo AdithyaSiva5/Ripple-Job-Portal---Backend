@@ -8,6 +8,8 @@ import speakeasy from "speakeasy";
 import { IUser, UserType } from "../models/user/userTypes";
 import Connections from "../models/connections/connectionModel";
 import jwt from "jsonwebtoken";
+import { RequestWithToken } from "../middlewares/RequestWithToken";
+import JobCategory from "../models/jobCategory/jobCategoryModel";
 
 // @desc    Register new User
 // @route   USER /register
@@ -262,12 +264,10 @@ export const forgotOtp = asyncHandler(async (req: Request, res: Response) => {
   delete sessionData.otp;
   delete sessionData.otpGeneratedTime;
 
-  res
-    .status(200)
-    .json({
-      message: "OTP has been verified. Please reset password",
-      email: sessionData?.email,
-    });
+  res.status(200).json({
+    message: "OTP has been verified. Please reset password",
+    email: sessionData?.email,
+  });
 });
 
 // @desc    Reset-Password
@@ -424,12 +424,10 @@ export const updateBasicInformation = async (req: Request, res: Response) => {
     await user.save();
     const userData = await User.findOne({ _id: userId }, { password: 0 });
 
-    res
-      .status(200)
-      .json({
-        message: "Basic information updated successfully",
-        user: userData,
-      });
+    res.status(200).json({
+      message: "Basic information updated successfully",
+      user: userData,
+    });
   } catch (error) {
     console.error("Error updating basic information:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -471,36 +469,77 @@ export const getUserDetails = asyncHandler(
     } else {
       res.status(404);
       throw new Error(" user Not found");
-    } 
+    }
   }
 );
 
-
-
-export const getSettings = async (req: Request, res: Response) => {
+export const getSettings = async (req: RequestWithToken, res: Response) => {
   try {
-    const { userId } = req.body;
+    const userId = req.user._id;
+    console.log("Getting settings for user:", userId);
+
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      console.log("User not found");
+      return res.status(404).json({ message: "User not found" });
     }
-    res.json(user);
+    const jobCategories = await JobCategory.find({ isBlocked: false });
+    console.log("Fetched job categories:", jobCategories);
+
+
+    const responseData = {
+      user,
+      jobCategories: jobCategories.map(category => ({
+        id: category._id,
+        name: category.jobCategory
+      }))
+    };
+
+    console.log("Sending response data:", responseData);
+    res.json(responseData);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });  
+    console.error("Error in getSettings:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-
-
-export const updateSettings = async (req: Request, res: Response) => {
+export const updateSettings = async (req: RequestWithToken, res: Response) => {
   try {
-    const { userId, ...updates } = req.body;
-    const user = await User.findByIdAndUpdate(userId, updates, { new: true });
+    const userId = req.user._id;
+    const updates = req.body;
+    console.log("Updating settings for user:", userId);
+    console.log("Received updates:", updates);
+
+    const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      console.log("User not found");
+      return res.status(404).json({ message: "User not found" });
     }
+
+    if (updates.profile) {
+      user.profile = { ...user.profile, ...updates.profile };
+    }
+    if (updates.experience) {
+      user.profile.experience = updates.experience;
+    }
+    if (updates.skills) {
+      user.profile.skills = updates.skills;
+    }
+    if (updates.qualification) {
+      user.profile.qualification = updates.qualification;
+    }
+    if (updates.gender) {
+      user.profile.gender = updates.gender;
+    }
+
+    console.log("Updated user object:", user);
+
+    await user.save();
+    console.log("User saved successfully");
+
     res.json(user);
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error in updateSettings:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
