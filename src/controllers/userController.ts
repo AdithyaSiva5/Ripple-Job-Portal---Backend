@@ -489,7 +489,6 @@ export const getSettings = async (req: RequestWithToken, res: Response) => {
         name: category.jobCategory,
       })),
     };
-    console.log("Sending response data:", responseData.user.profile);
     res.json(responseData);
   } catch (error) {
     console.error("Error in getSettings:", error);
@@ -501,8 +500,6 @@ export const updateSettings = async (req: RequestWithToken, res: Response) => {
   try {
     const userId = req.user._id;
     const updates = req.body;
-    console.log("Updating settings for user:", userId);
-    console.log("Received updates:", updates);
 
     const user = await User.findById(userId);
     if (!user) {
@@ -525,12 +522,7 @@ export const updateSettings = async (req: RequestWithToken, res: Response) => {
     if (updates.gender) {
       user.profile.gender = updates.gender;
     }
-
-    console.log("Updated user object:", user.profile);
-
     await user.save();
-    console.log("User saved successfully");
-
     res.json(user);
   } catch (error) {
     console.error("Error in updateSettings:", error);

@@ -1,9 +1,6 @@
-// userModel.ts
-
 import mongoose, { Schema } from 'mongoose';
 import { IUser, UserType } from './userTypes';
 
-// Create the user schema
 const UserSchema: Schema<IUser> = new Schema({
   username: { type: String, required: true },
   email: { type: String, required: true, unique: true },
