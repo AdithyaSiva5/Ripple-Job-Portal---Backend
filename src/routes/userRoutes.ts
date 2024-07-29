@@ -18,7 +18,7 @@ import {
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth";
 import { getPremiumUserData, initiatecheckout, validatePayment } from "../controllers/checkoutController";
-import { getNotifications } from "../controllers/notificationController";
+import { clearnotification, getNotifications } from "../controllers/notificationController";
 import { searchAllCollections } from "../controllers/searchController";
 const router = express.Router();
 
@@ -43,6 +43,7 @@ router.post("/checkout-user",protect, initiatecheckout);
 router.post("/validate-payment",protect,validatePayment);
 router.post("/get-transactions",protect,getPremiumUserData);
 router.post("/get-notifications",protect,getNotifications )
+router.delete("/clear-notifications",protect,clearnotification)
 router.get("/search",protect,searchAllCollections)
 router.get('/get-settings',protect, getSettings); 
 router.post('/update-settings',protect, updateSettings);
