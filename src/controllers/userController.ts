@@ -496,36 +496,3 @@ export const getSettings = async (req: RequestWithToken, res: Response) => {
   }
 };
 
-export const updateSettings = async (req: RequestWithToken, res: Response) => {
-  try {
-    const userId = req.user._id;
-    const updates = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      console.log("User not found");
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (updates.profile) {
-      user.profile = { ...user.profile, ...updates.profile };
-    }
-    if (updates.experience) {
-      user.profile.experience = updates.experience;
-    }
-    if (updates.skills) {
-      user.profile.skills = updates.skills;
-    }
-    if (updates.qualification) {
-      user.profile.qualification = updates.qualification;
-    }
-    if (updates.gender) {
-      user.profile.gender = updates.gender;
-    }
-    await user.save();
-    res.json(user);
-  } catch (error) {
-    console.error("Error in updateSettings:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-};

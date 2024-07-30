@@ -243,8 +243,9 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
     createNotification(notificationData)
 
     await User.updateOne({ _id: applicantId }, { $inc: { dailyJobsApplied: 1 } });
+    const user=await User.findOne({_id:applicantId})
 
-    res.status(201).json({success:true, message: 'Job application submitted ', jobApplication: newJobApplication });
+    res.status(201).json({ message: 'Job application submitted ', jobApplication: newJobApplication ,user});
   } catch (error) {
     console.error('Error adding job application:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -414,23 +415,25 @@ export const getAllJobDetails = async (req: Request, res: Response): Promise<voi
 
 //cancel job application request
 export const cancelJobApplication = async (req: Request, res: Response): Promise<void> => {
- 
   try {
-    const { applicationId } = req.body;
-    const jobApplication = await JobApplication.findByIdAndUpdate(
-      applicationId,
-      { isCanceled: true },
-      { new: true }
-    );
+    const { applicationId ,applicantId} = req.body; 
+    const jobApplication = await JobApplication.findById(applicationId);
 
     if (!jobApplication) {
-      res.status(404).json({ success: false, message: 'Job application not found' });
+      res.status(404).json({ message: 'Job application not found' });
       return;
     }
+    jobApplication.isDeleted = !jobApplication.isDeleted;
 
-    res.status(200).json({ success: true, message: 'Job application canceled successfully', jobApplication });
+    await jobApplication.save();
+
+    const applications = await JobApplication.find({ applicantId ,
+      isDeleted: { $ne: true}}) .populate('applicantId').populate('jobId')
+      .exec();
+
+    res.status(200).json({ success: true,message:"Application Canceled", applications });
   } catch (error) {
-    console.error('Error canceling job application:', error);
+    console.error('Error fetching employee applications:', error);
     res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };

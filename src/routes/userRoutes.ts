@@ -13,13 +13,13 @@ import {
   getUserDetails,
   updateUserRole,
   userSuggestions,
-  updateSettings,
   getSettings,
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth";
 import { getPremiumUserData, initiatecheckout, validatePayment } from "../controllers/checkoutController";
 import { clearnotification, getNotifications } from "../controllers/notificationController";
 import { searchAllCollections } from "../controllers/searchController";
+import { updateSettings } from "../controllers/settingsvalidation";
 const router = express.Router();
 
 router.get("/", (req: Request, res: Response) => {

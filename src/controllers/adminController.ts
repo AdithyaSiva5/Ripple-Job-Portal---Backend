@@ -1,17 +1,14 @@
 import express, { Request, Response } from "express";
 import Post from "../models/post/postModel";
 const router =express.Router()
-
 import asyncHandler from "express-async-handler";
 import Admin from "../models/admin/adminModel";
-import generateToken from "../utils/generateToken";
-import bcrypt from "bcryptjs";
 import User from "../models/user/userModel";
 import JobCategory from "../models/jobCategory/jobCategoryModel";
 import Job from "../models/jobs/jobModel";
-import { populate } from "dotenv";
 import Report from "../models/reports/reportModel";
 import PremiumUsers from "../models/premium/premiumModel";
+import adminToken from "../utils/adminToken";
 
 
 
@@ -33,7 +30,7 @@ export const Login = asyncHandler(async (req: Request, res: Response) => {
             name: admin.name,
             email: admin.email,
             profileImg: admin.profileImg,
-            token: generateToken(admin.id),
+            token: adminToken(admin.id),
         });
     } else {
         res.status(400);
@@ -302,10 +299,34 @@ export const getTransactionsController = asyncHandler(async (req: Request, res: 
 
 export const chartDataController = asyncHandler(
   async (req: Request, res: Response) => {
+    const fourMonthsAgo = new Date();
+    fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+    fourMonthsAgo.setHours(0, 0, 0, 0);
+
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+
+    const generateDateRange = (start: Date, end: Date) => {
+      const dates = [];
+      let currentDate = new Date(start);
+      while (currentDate <= end) {
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+      return dates;
+    };
+
+    const dateRange = generateDateRange(fourMonthsAgo, today);
+
     const userJoinStats = await User.aggregate([
       {
+        $match: {
+          createdAt: { $gte: fourMonthsAgo, $lte: today }
+        }
+      },
+      {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           userCount: { $sum: 1 },
         },
       },
@@ -316,8 +337,13 @@ export const chartDataController = asyncHandler(
 
     const postCreationStats = await Post.aggregate([
       {
+        $match: {
+          date: { $gte: fourMonthsAgo, $lte: today }
+        }
+      },
+      {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$date" } },
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
           postCount: { $sum: 1 },
         },
       },
@@ -328,8 +354,13 @@ export const chartDataController = asyncHandler(
 
     const jobCreationStats = await Job.aggregate([
       {
+        $match: {
+          createdAt: { $gte: fourMonthsAgo, $lte: today }
+        }
+      },
+      {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } },
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           jobCount: { $sum: 1 },
         },
       },
@@ -338,10 +369,18 @@ export const chartDataController = asyncHandler(
       },
     ]);
 
+    const fillMissingDates = (stats: any[], dateField: string) => {
+      const statsMap = new Map(stats.map(item => [item._id, item]));
+      return dateRange.map(date => {
+        const dateString = date.toISOString().split('T')[0];
+        return statsMap.get(dateString) || { _id: dateString, [dateField]: 0 };
+      });
+    };
+
     const chartData = {
-      userJoinStats,
-      postCreationStats,
-      jobCreationStats,
+      userJoinStats: fillMissingDates(userJoinStats, 'userCount'),
+      postCreationStats: fillMissingDates(postCreationStats, 'postCount'),
+      jobCreationStats: fillMissingDates(jobCreationStats, 'jobCount'),
     };
 
     res.json(chartData);
