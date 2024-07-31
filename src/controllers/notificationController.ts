@@ -34,14 +34,14 @@ export const getNotifications = async (
   }
 };
 
-export const clearnotification = async(
+export const clearnotification = async (
   req: RequestWithToken,
   res: Response
 ): Promise<void> => {
   try {
     const userId = req.user._id;
     await Notification.deleteMany({ receiverId: userId });
-    res.status(200).json({ message: 'All notifications cleared successfully' });
+    res.status(200).json({ message: "All notifications cleared successfully" });
   } catch (error) {
     console.error("Error Clearing notifications:", error);
     res.status(500).json({ message: "Error Clearing notifications" });

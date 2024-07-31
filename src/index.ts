@@ -19,6 +19,7 @@ import { Server, Socket } from "socket.io";
 import socketIo_Config from "./utils/socket/socket";
 import http from "http";
 import runScheduledTask from "./utils/scheduledTask";
+import cookieParser from 'cookie-parser';
 
 dotenv.config();
 
@@ -61,6 +62,10 @@ app.use(
     },
   })
 );
+
+app.use(cookieParser());
+
+
 app.use("/api/", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/post", postRoutes);

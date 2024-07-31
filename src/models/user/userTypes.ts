@@ -1,6 +1,6 @@
 // types.ts
 
-import { Date, Document, Types } from 'mongoose';
+import { Date, Document, Types } from "mongoose";
 
 export interface Qualification {
   course: string;
@@ -8,20 +8,16 @@ export interface Qualification {
   yearOfCompletion: number;
 }
 
-
 export interface Experience {
   jobPosition: string;
   yearOfJoining: number;
   companyName: string;
 }
 
-
 export enum UserType {
-  Company = 'organization',
-  Individual = 'individual',
+  Company = "organization",
+  Individual = "individual",
 }
-
-
 
 // Define the profile schema
 export interface Profile {
@@ -32,9 +28,9 @@ export interface Profile {
   skills?: string[];
   resume?: string;
   gender?: string;
-  dateOfBirth?:Date;
-  designation?:string;
-  fullname?:string;
+  dateOfBirth?: Date;
+  designation?: string;
+  fullname?: string;
 }
 
 // Define the company profile schema
@@ -43,8 +39,8 @@ export interface CompanyProfile {
   companyLocation?: string;
   aboutCompany?: string;
   noOfEmployees?: string;
-  establishedOn?:Date;
-  companyType?:string;
+  establishedOn?: Date;
+  companyType?: string;
 }
 
 // Define the user document interface
@@ -54,12 +50,12 @@ export interface IUser extends Document {
   password: string;
   isHiring: boolean;
   isBlocked: boolean;
-  isGoogle:boolean;
-  isFacebook:boolean;
-  isPremium:boolean;
+  isGoogle: boolean;
+  isFacebook: boolean;
+  isPremium: boolean;
   isOnline: boolean;
-  dailyJobsApplied:number;
-  premiumExpiryDate:Date;
+  dailyJobsApplied: number;
+  premiumExpiryDate: Date;
   userType: UserType;
   profile: Profile;
   companyProfile: CompanyProfile;
@@ -68,5 +64,6 @@ export interface IUser extends Document {
   savedJobs: Types.ObjectId[];
   isActive: boolean;
   profileImageUrl: string;
+  refreshToken: string,
   timestamp: Date;
 }

@@ -10,6 +10,7 @@ import Connections from "../models/connections/connectionModel";
 import jwt from "jsonwebtoken";
 import { RequestWithToken } from "../middlewares/RequestWithToken";
 import JobCategory from "../models/jobCategory/jobCategoryModel";
+import generateRefreshToken from "../utils/generateRefreshToken";
 
 // @desc    Register new User
 // @route   USER /register
@@ -131,21 +132,30 @@ export const resendOtp = asyncHandler(async (req: Request, res: Response) => {
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  console.log(req.body);
   const user = await User.findOne({ email });
-  if (user) {
+  if (user && (await bcrypt.compare(password, user.password))) {
     if (user.isBlocked) {
       res.status(400);
       throw new Error("User is blocked");
     }
-  }
-  if (user && (await bcrypt.compare(password, user.password))) {
-    const userData = await User.findOne({ email }, { password: 0 });
-    res.json({
-      message: "Login Sucessful",
+    const accessToken = generateToken(user.id);
+    const refreshToken = generateRefreshToken(user.id);
+    user.refreshToken = refreshToken;
+    await user.save();
 
+    const userData = await User.findOne({ email }, { password: 0, refreshToken: 0 });
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 24 * 60 * 60 * 1000, // 60 days
+    });
+
+    res.json({
+      message: "Login Successful",
       user: userData,
-      token: generateToken(user.id),
+      accessToken,
     });
   } else {
     res.status(400);
@@ -169,19 +179,29 @@ export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
         return;
       }
 
-      if (userExist) {
-        const userData = await User.findOne({ email }, { password: 0 });
-        res.json({
-          message: "Login Successful",
-          user: userData,
-          token: generateToken(userExist.id),
-        });
-        return;
-      }
+      const accessToken = generateToken(userExist.id);
+      const refreshToken = generateRefreshToken(userExist.id);
+
+      userExist.refreshToken = refreshToken;
+      await userExist.save();
+
+      const userData = await User.findOne({ email }, { password: 0, refreshToken: 0 });
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 24 * 60 * 60 * 1000, 
+      });
+      res.json({
+        message: "Login Successful",
+        user: userData,
+        accessToken,
+      });
+      return;
     }
 
     const randomPassword = Math.random().toString(36).slice(-8);
-
     const hashedPassword = await bcrypt.hash(randomPassword, 10);
 
     const newUser = await User.create({
@@ -192,12 +212,18 @@ export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
       isGoogle: true,
     });
 
-    const token = generateToken(newUser.id);
-    const userData = await User.findOne({ email }, { password: 0 });
+    const accessToken = generateToken(newUser.id);
+    const refreshToken = generateRefreshToken(newUser.id);
+
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
+
+    const userData = await User.findOne({ email }, { password: 0, refreshToken: 0 });
     res.status(200).json({
       message: "Login Successful",
       user: userData,
-      token: token,
+      accessToken,
+      refreshToken
     });
   } catch (error) {
     console.error("Error in Google authentication:", error);
@@ -496,3 +522,75 @@ export const getSettings = async (req: RequestWithToken, res: Response) => {
   }
 };
 
+export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
+  const refreshToken = req.cookies.refreshToken;
+  console.log("Received refresh token:", refreshToken);
+  if (!refreshToken) {
+    res.status(400);
+    throw new Error("Refresh token is required");
+  }
+
+  try {
+    const decoded: any = jwt.verify(refreshToken, process.env.JWT_SECRET as string);
+    const user = await User.findOne({ _id: decoded.id, refreshToken: refreshToken });
+
+    if (!user) {
+      res.status(401);
+      throw new Error("Invalid refresh token");
+    }
+
+    const newAccessToken = generateToken(user._id);
+    const newRefreshToken = generateRefreshToken(user._id);
+
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 24 * 60 * 60 * 1000, 
+    });
+
+    res.json({ accessToken: newAccessToken });
+  } catch (error) {
+    res.status(401);
+    throw new Error("Invalid refresh token");
+  }
+});
+
+export const logout = asyncHandler(async (req: Request, res: Response) => {
+  
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    res.status(400);
+    throw new Error("Refresh token is required");
+  }
+  
+  try {
+    const user = await User.findOneAndUpdate(
+      { refreshToken: refreshToken },
+      { $unset: { refreshToken: 1 } },
+      { new: true }
+    );
+
+
+    if (!user) {
+      res.status(400);
+      throw new Error("User not found or already logged out");
+    }
+
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+    
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Error during logout process:", error);
+    res.status(500);
+    throw new Error("An error occurred during logout");
+  }
+});
