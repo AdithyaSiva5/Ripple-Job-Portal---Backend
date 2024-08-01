@@ -1,0 +1,13 @@
+PORT = 3000
+MONGO_URL = 
+JWT_SECRET = 
+SESSION_SECRET = 
+NODEMAILER_EMAIL=
+NODEMAILER_PASSWORD =
+SMTP_HOST=
+SMTP_PORT=
+SUCCESS_URL=http://localhost:5173/premium/payment-success
+CANCEL_URL=http://localhost:5173/premium/payment-failed
+DOMAIN_URL=http://localhost:5173
+STRIPE_SECRET=
+NODE_ENV = production 
