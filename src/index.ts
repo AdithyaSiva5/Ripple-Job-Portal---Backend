@@ -49,6 +49,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
+app.use(express.static(path.join(__dirname, '../../Ripple-Job-Portal-Frontend/dist')));
 
 const sessionSecret = process.env.SESSION_SECRET || "default_secret_key";
 
@@ -92,4 +93,8 @@ const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../Ripple-Job-Portal-Frontend/dist/index.html'));
 });
