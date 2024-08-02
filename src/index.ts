@@ -33,17 +33,15 @@ declare module "express-session" {
     email?: string;
   }
 }
-app.use(
-  cors({
-    origin: process.env.DOMAIN_URL,
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true,
-  })
-);
+    app.use(
+      cors({
+        origin: '*',
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true,
+      })
+    );
 
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
   console.log(`${req.method} ${req.url}`);
   next();
 });
