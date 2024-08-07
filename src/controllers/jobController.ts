@@ -65,7 +65,6 @@ export const editJob = asyncHandler(async (req: Request, res: Response): Promise
       jobDescription,
       qualification,
     } = req.body;
-  console.log(req.body);
   
     
     const existingJob = await Job.findById(jobId);

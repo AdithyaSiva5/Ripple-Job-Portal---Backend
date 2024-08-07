@@ -273,7 +273,7 @@ export const editComment = asyncHandler(async (req: any, res: Response) => {
   console.log("Edit comment request received");
   const { commentId } = req.params;
   const { comment } = req.body;
-  
+
   if (!req.user) {
     res.status(401);
     throw new Error("User not authenticated");

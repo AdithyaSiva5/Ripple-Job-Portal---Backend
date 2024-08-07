@@ -531,9 +531,9 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
   }
 
   try {
-    const decoded: any = jwt.verify(refreshToken, process.env.JWT_SECRET as string);
-    const user = await User.findOne({ _id: decoded.id, refreshToken: refreshToken });
 
+    const decoded: any = jwt.verify(refreshToken, process.env.JWT_SECRET as string);
+    const user = await User.findOne({ _id: decoded.id });
     if (!user) {
       res.status(401);
       throw new Error("Invalid refresh token");
@@ -551,12 +551,12 @@ export const refreshToken = asyncHandler(async (req: Request, res: Response) => 
       sameSite: 'strict',
       maxAge: 60 * 24 * 60 * 60 * 1000, 
     });
-
     res.json({ accessToken: newAccessToken });
   } catch (error) {
     res.status(401);
     throw new Error("Invalid refresh token");
   }
+ 
 });
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
@@ -594,3 +594,29 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("An error occurred during logout");
   }
 });
+
+export const updateUserResume = async (req: RequestWithToken, res: Response) => {
+  try {
+    const userId = req.user._id; // Assuming you have user info in req.user from the protect middleware
+    const resumeFilename = req.file?.filename;
+
+    if (!resumeFilename) {
+      return res.status(400).json({ message: 'No resume file uploaded' });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { 'profile.resume': resumeFilename },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({ message: 'Resume updated successfully', user: updatedUser });
+  } catch (error) {
+    console.error('Error updating resume:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

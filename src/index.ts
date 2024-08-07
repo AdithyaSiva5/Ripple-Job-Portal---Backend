@@ -35,7 +35,7 @@ declare module "express-session" {
 }
     app.use(
       cors({
-        origin: '*',
+        origin: process.env.DOMAIN_URL,
         methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
         credentials: true,
       })

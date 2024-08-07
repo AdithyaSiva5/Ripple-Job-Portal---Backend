@@ -16,6 +16,7 @@ import {
   getSettings,
   refreshToken,
   logout,
+  updateUserResume,
 } from "../controllers/userController";
 import { protect } from "../middlewares/auth";
 import {
@@ -29,7 +30,25 @@ import {
 } from "../controllers/notificationController";
 import { searchAllCollections } from "../controllers/searchController";
 import { updateSettings } from "../controllers/settingsvalidation";
+import multer from "multer";
+import path from "path";
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "src/public/uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
+    );
+  },
+});
+
+
+const upload = multer({ storage: storage });
 const router = express.Router();
+upload.any();
 
 router.get("/", (req: Request, res: Response) => {
   res.send("Ripple Job Portal");
@@ -58,5 +77,11 @@ router.get("/get-settings", protect, getSettings);
 router.post("/update-settings", protect, updateSettings);
 router.post("/refresh-token", refreshToken);
 router.post("/logout", logout);
+router.post(
+  "/update-resume",
+  protect,
+  upload.single("resume"),
+  updateUserResume
+);
 
 export default router;
