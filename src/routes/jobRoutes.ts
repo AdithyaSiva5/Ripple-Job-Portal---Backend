@@ -46,7 +46,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-upload.any(); 
+upload.any();
 
 router.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.log(req);

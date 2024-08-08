@@ -595,11 +595,10 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-export const updateUserResume = async (req: RequestWithToken, res: Response) => {
+export const updateUserResume = async (req: Request, res: Response) => {
   try {
-    const userId = req.user._id; // Assuming you have user info in req.user from the protect middleware
+    const userId = req.body.userId;
     const resumeFilename = req.file?.filename;
-
     if (!resumeFilename) {
       return res.status(400).json({ message: 'No resume file uploaded' });
     }

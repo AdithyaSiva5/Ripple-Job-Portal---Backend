@@ -199,15 +199,25 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
       jobId,
       applicationStatus,
       coverLetter,
+      useExistingResume,
     } = req.body;
 
-    const resume = req.file?.filename; 
+    let resume;
 
-    if (!resume) {
-      res.status(400).json({ message: 'No Resume uploaded' });
-      return;
+    if (useExistingResume === 'true') {
+      const user = await User.findById(applicantId);
+      if (!user || !user.profile || !user.profile.resume) {
+        res.status(400).json({ message: 'No existing resume found. Please upload a resume.' });
+        return;
+      }
+      resume = user.profile.resume;
+    } else {
+      resume = req.file?.filename;
+      if (!resume) {
+        res.status(400).json({ message: 'Please upload a resume.' });
+        return;
+      }
     }
-
 
     const existingApplication = await JobApplication.findOne({
       applicantId,
@@ -228,23 +238,22 @@ export const addJobApplication = async (req: Request, res: Response): Promise<vo
     });
 
     await newJobApplication.save();
-    const job = await Job.findOne({_id:jobId})
+    const job = await Job.findOne({ _id: jobId });
     const notificationData = {
-      senderId:applicantId,
+      senderId: applicantId,
       receiverId: job?.userId,
-      message: `applied for the postion of ${job?.jobRole} at ${job?.companyName} `,
-      link: `/visit-profile/posts/`, 
-      read: false, 
-      jobId:jobId
-   
+      message: `applied for the position of ${job?.jobRole} at ${job?.companyName}`,
+      link: `/visit-profile/posts/`,
+      read: false,
+      jobId: jobId
     };
 
-    createNotification(notificationData)
+    createNotification(notificationData);
 
     await User.updateOne({ _id: applicantId }, { $inc: { dailyJobsApplied: 1 } });
-    const user=await User.findOne({_id:applicantId})
+    const user = await User.findOne({ _id: applicantId });
 
-    res.status(201).json({ message: 'Job application submitted ', jobApplication: newJobApplication ,user});
+    res.status(201).json({ message: 'Job application submitted', jobApplication: newJobApplication, user });
   } catch (error) {
     console.error('Error adding job application:', error);
     res.status(500).json({ message: 'Internal server error' });
