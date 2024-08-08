@@ -328,13 +328,9 @@ export const updateApplicationStatus = async (req: Request, res: Response): Prom
 
 //get employee applications
 export const employeeApplications = async (req: Request, res: Response): Promise<void> => {
-  console.log("reached  employeeApplications ");
   
   try {
-
-    
     const { applicantId } = req.body;
-    console.log(applicantId);
     const applications = await JobApplication.find({applicantId:applicantId })
       .populate({
         path: 'jobId',
