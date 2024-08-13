@@ -42,6 +42,7 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
       select: "username profileImageUrl",
     })
     .sort({ date: -1 });
+
   const populatedPost = await Post.findById(post._id).populate({
     path: "userId",
     select: "username profileImageUrl",
