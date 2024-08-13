@@ -42,13 +42,17 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
       select: "username profileImageUrl",
     })
     .sort({ date: -1 });
+  const populatedPost = await Post.findById(post._id).populate({
+    path: "userId",
+    select: "username profileImageUrl",
+  });
 
   if (posts.length == 0) {
     res.status(400);
     throw new Error("No Post available");
   }
 
-  res.status(200).json({ message: "Post added successfully", posts: posts });
+  res.status(200).json({ message: "Post added successfully", posts: populatedPost });
 });
 
 // @desc    Get all Posts

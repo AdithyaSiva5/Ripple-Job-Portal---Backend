@@ -19,7 +19,7 @@ import { Server, Socket } from "socket.io";
 import socketIo_Config from "./utils/socket/socket";
 import http from "http";
 import runScheduledTask from "./utils/scheduledTask";
-import cookieParser from 'cookie-parser';
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -33,13 +33,13 @@ declare module "express-session" {
     email?: string;
   }
 }
-    app.use(
-      cors({
-        origin: '*',
-        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-        credentials: true,
-      })
-    );
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true,
+  })
+);
 
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -49,7 +49,9 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "public", "uploads")));
-app.use(express.static(path.join(__dirname, '../../Ripple-Job-Portal-Frontend/dist')));
+app.use(
+  express.static(path.join(__dirname, "../../Ripple-Job-Portal-Frontend/dist"))
+);
 
 const sessionSecret = process.env.SESSION_SECRET || "default_secret_key";
 
@@ -65,7 +67,6 @@ app.use(
 );
 
 app.use(cookieParser());
-
 
 app.use("/api/", userRoutes);
 app.use("/api/admin", adminRoutes);
@@ -92,10 +93,12 @@ connectDB();
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
-  console.log("---------------BACKEND -----------")
+  console.log("---------------BACKEND -----------");
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../Ripple-Job-Portal-Frontend/dist/index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "../../Ripple-Job-Portal-Frontend/dist/index.html")
+  );
 });
