@@ -143,12 +143,15 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    const userData = await User.findOne({ email }, { password: 0, refreshToken: 0 });
+    const userData = await User.findOne(
+      { email },
+      { password: 0, refreshToken: 0 }
+    );
 
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       maxAge: 60 * 24 * 60 * 60 * 1000, // 60 days
     });
 
@@ -185,13 +188,16 @@ export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
       userExist.refreshToken = refreshToken;
       await userExist.save();
 
-      const userData = await User.findOne({ email }, { password: 0, refreshToken: 0 });
+      const userData = await User.findOne(
+        { email },
+        { password: 0, refreshToken: 0 }
+      );
 
-      res.cookie('refreshToken', refreshToken, {
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 24 * 60 * 60 * 1000, 
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 24 * 60 * 60 * 1000,
       });
       res.json({
         message: "Login Successful",
@@ -218,12 +224,15 @@ export const googleAuth = asyncHandler(async (req: Request, res: Response) => {
     newUser.refreshToken = refreshToken;
     await newUser.save();
 
-    const userData = await User.findOne({ email }, { password: 0, refreshToken: 0 });
+    const userData = await User.findOne(
+      { email },
+      { password: 0, refreshToken: 0 }
+    );
     res.status(200).json({
       message: "Login Successful",
       user: userData,
       accessToken,
-      refreshToken
+      refreshToken,
     });
   } catch (error) {
     console.error("Error in Google authentication:", error);
@@ -522,52 +531,54 @@ export const getSettings = async (req: RequestWithToken, res: Response) => {
   }
 };
 
-export const refreshToken = asyncHandler(async (req: Request, res: Response) => {
-  const refreshToken = req.cookies.refreshToken;
-  console.log("Received refresh token:", refreshToken);
-  if (!refreshToken) {
-    res.status(400);
-    throw new Error("Refresh token is required");
-  }
+export const refreshToken = asyncHandler(
+  async (req: Request, res: Response) => {
+    const refreshToken = req.cookies.refreshToken;
+    console.log("Received refresh token:", refreshToken);
+    if (!refreshToken) {
+      res.status(400);
+      throw new Error("Refresh token is required");
+    }
 
-  try {
+    try {
+      const decoded: any = jwt.verify(
+        refreshToken,
+        process.env.JWT_SECRET as string
+      );
+      const user = await User.findOne({ _id: decoded.id });
+      if (!user) {
+        res.status(401);
+        throw new Error("Invalid refresh token");
+      }
 
-    const decoded: any = jwt.verify(refreshToken, process.env.JWT_SECRET as string);
-    const user = await User.findOne({ _id: decoded.id });
-    if (!user) {
+      const newAccessToken = generateToken(user._id);
+      const newRefreshToken = generateRefreshToken(user._id);
+
+      user.refreshToken = newRefreshToken;
+      await user.save();
+
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 60 * 24 * 60 * 60 * 1000,
+      });
+      res.json({ accessToken: newAccessToken });
+    } catch (error) {
       res.status(401);
       throw new Error("Invalid refresh token");
     }
-
-    const newAccessToken = generateToken(user._id);
-    const newRefreshToken = generateRefreshToken(user._id);
-
-    user.refreshToken = newRefreshToken;
-    await user.save();
-
-    res.cookie('refreshToken', newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 24 * 60 * 60 * 1000, 
-    });
-    res.json({ accessToken: newAccessToken });
-  } catch (error) {
-    res.status(401);
-    throw new Error("Invalid refresh token");
   }
- 
-});
+);
 
 export const logout = asyncHandler(async (req: Request, res: Response) => {
-  
   const refreshToken = req.cookies.refreshToken;
 
   if (!refreshToken) {
     res.status(400);
     throw new Error("Refresh token is required");
   }
-  
+
   try {
     const user = await User.findOneAndUpdate(
       { refreshToken: refreshToken },
@@ -575,18 +586,17 @@ export const logout = asyncHandler(async (req: Request, res: Response) => {
       { new: true }
     );
 
-
     if (!user) {
       res.status(400);
       throw new Error("User not found or already logged out");
     }
 
-    res.clearCookie('refreshToken', {
+    res.clearCookie("refreshToken", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict'
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
-    
+
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     console.error("Error during logout process:", error);
@@ -600,22 +610,24 @@ export const updateUserResume = async (req: Request, res: Response) => {
     const userId = req.body.userId;
     const resumeFilename = req.file?.filename;
     if (!resumeFilename) {
-      return res.status(400).json({ message: 'No resume file uploaded' });
+      return res.status(400).json({ message: "No resume file uploaded" });
     }
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { 'profile.resume': resumeFilename },
+      { "profile.resume": resumeFilename },
       { new: true }
     );
 
     if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ message: 'Resume updated successfully', user: updatedUser });
+    res
+      .status(200)
+      .json({ message: "Resume updated successfully", user: updatedUser });
   } catch (error) {
-    console.error('Error updating resume:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error updating resume:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -20,6 +20,7 @@ import socketIo_Config from "./utils/socket/socket";
 import http from "http";
 import runScheduledTask from "./utils/scheduledTask";
 import cookieParser from "cookie-parser";
+import { scheduleInterviewReminders } from "./utils/interviewRemainter";
 
 dotenv.config();
 
@@ -76,7 +77,7 @@ app.use("/api/connection", connectionRoutes);
 app.use("/api/chat", chatRoutes);
 
 runScheduledTask();
-
+scheduleInterviewReminders();
 // Create HTTP server
 const server = http.createServer(app);
 

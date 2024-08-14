@@ -1,17 +1,16 @@
 import nodemailer from "nodemailer";
 import { Request } from "express";
 import { SessionData } from "express-session";
-import dotenv from "dotenv"
-
+import dotenv from "dotenv";
 
 const sendVerifyMail = async (req: Request, name: string, email: string) => {
   try {
     const sessionData = req.session!;
-    const otp = sessionData!.otp; 
+    const otp = sessionData!.otp;
     sessionData!.otpGeneratedTime = Date.now();
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
-      port: 587, 
+      port: 587,
       secure: false,
       requireTLS: true,
       tls: {
@@ -23,8 +22,6 @@ const sendVerifyMail = async (req: Request, name: string, email: string) => {
       },
     });
 
-
-    
     const mailOptions: nodemailer.SendMailOptions = {
       from: "ripplejobportal@gmail.com",
       to: email,

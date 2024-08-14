@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Interview from "../models/interview/interviewModel";
 import JobApplication from "../models/jobApplication/jobApplicationModel";
 import Job from "../models/jobs/jobModel";
+import { handleInterviewNotification } from "../utils/interviewNotifications";
 
 // Controller function to add an interview
 export const addInterview = async (
@@ -71,13 +72,12 @@ export const addInterview = async (
       .populate("jobId")
       .exec();
 
-    res
-      .status(201)
-      .json({
-        message: "Interview scheduled successfully",
-        interview: savedInterview,
-        applications: applications,
-      });
+    res.status(201).json({
+      message: "Interview scheduled successfully",
+      interview: savedInterview,
+      applications: applications,
+    });
+    await handleInterviewNotification(savedInterview, false);
   } catch (error) {
     console.error("Error adding interview:", error);
     res.status(500).json({ message: "Error adding interview" });
@@ -106,12 +106,11 @@ export const editInterview = async (
 
     const updatedInterview = await existingInterview.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Interview updated successfully",
-        interview: updatedInterview,
-      });
+    res.status(200).json({
+      message: "Interview updated successfully",
+      interview: updatedInterview,
+    });
+    await handleInterviewNotification(updatedInterview, false);
   } catch (error) {
     console.error("Error editing interview:", error);
     res.status(500).json({ message: "Error editing interview" });
@@ -136,12 +135,10 @@ export const setInterviewStatus = async (
 
     const updatedInterview = await existingInterview.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Interview status updated successfully",
-        interview: updatedInterview,
-      });
+    res.status(200).json({
+      message: "Interview status updated successfully",
+      interview: updatedInterview,
+    });
   } catch (error) {
     console.error("Error changing interview status:", error);
     res.status(500).json({ message: "Error changing interview status" });
