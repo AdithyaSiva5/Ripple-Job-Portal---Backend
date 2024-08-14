@@ -9,6 +9,7 @@ import {
   getAllJobDetails,
   getFormSelectData,
   jobDetails,
+  jobRoles,
   listActiveJobs,
   listUserJobs,
   updateApplicationStatus,
@@ -88,5 +89,6 @@ router.post(
 router.post("/get-job-interviews", protect, getInterviewsByJobId);
 router.get("/form-select-data", protect, getFormSelectData);
 router.post("/block-job", userJobBlock);
+router.get("/job-roles" , jobRoles)
 
 export default router;
