@@ -221,9 +221,11 @@ export const addJobApplication = async (
     if (useExistingResume === "true") {
       const user = await User.findById(applicantId);
       if (!user || !user.profile || !user.profile.resume) {
-        res.status(400).json({
-          message: "No existing resume found. Please upload a resume.",
-        });
+        res
+          .status(400)
+          .json({
+            message: "No existing resume found. Please upload a resume.",
+          });
         return;
       }
       resume = user.profile.resume;
@@ -274,11 +276,13 @@ export const addJobApplication = async (
     );
     const user = await User.findOne({ _id: applicantId });
 
-    res.status(201).json({
-      message: "Job application submitted",
-      jobApplication: newJobApplication,
-      user,
-    });
+    res
+      .status(201)
+      .json({
+        message: "Job application submitted",
+        jobApplication: newJobApplication,
+        user,
+      });
   } catch (error) {
     console.error("Error adding job application:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -348,11 +352,13 @@ export const updateApplicationStatus = async (
       createNotification(notificationData);
     }
 
-    res.status(200).json({
-      message: `Job application ${status} successfully`,
-      applications,
-      jobSpecificApplications,
-    });
+    res
+      .status(200)
+      .json({
+        message: `Job application ${status} successfully`,
+        applications,
+        jobSpecificApplications,
+      });
   } catch (error) {
     console.error("Error accepting job application:", error);
     res.status(500).json({ message: "Internal server error" });
