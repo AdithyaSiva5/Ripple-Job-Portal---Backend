@@ -36,7 +36,7 @@ export const updateSettings = async (req: RequestWithToken, res: Response) => {
     const userId = req.user._id;
     const updates = req.body;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       console.log("User not found");
       return res.status(404).json({ message: "User not found" });

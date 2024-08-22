@@ -22,7 +22,6 @@ export const registerUser = asyncHandler(
     if (!username || !email || !password) {
       throw new Error("Please add fields");
     }
-    console.log(username, email, password);
 
     const userExist = await User.findOne({ email });
 
@@ -48,7 +47,7 @@ export const registerUser = asyncHandler(
     sessionData.userDetails!.password = hashedPassword;
     sendVerifyMail(req, username, email);
 
-    res.status(200).json({ message: "OTP sent for verification", email, otp });
+    res.status(200).json({ message: "OTP sent for verification", email });
   }
 );
 
@@ -341,7 +340,7 @@ export const updateUserTypeAndHiring = async (req: Request, res: Response) => {
   try {
     const { userId, userType, isHiring } = req.body;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -365,7 +364,7 @@ export const updateUserInformation = async (req: Request, res: Response) => {
   try {
     const { userId, userType, isHiring } = req.body;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -388,7 +387,7 @@ export const updateUserInformation = async (req: Request, res: Response) => {
 export const updateUserRole = async (req: Request, res: Response) => {
   try {
     const { userId, userType, isHiring } = req.body;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -406,7 +405,7 @@ export const updateBasicInformation = async (req: Request, res: Response) => {
   try {
     const { userId, imageUrl } = req.body;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -486,7 +485,7 @@ export const userSuggestions = asyncHandler(
       {
         _id: { $nin: [...followingIds, ...requestedIds, userId] },
       },
-      { password: 0 }
+      { password: 0 , refreshToken: 0  }
     );
 
     res.status(200).json({ suggestedUsers });
@@ -497,7 +496,7 @@ export const getUserDetails = asyncHandler(
   async (req: Request, res: Response) => {
     const { userId } = req.params;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
 
     if (user) {
       res.status(200).json({ user });
@@ -512,7 +511,7 @@ export const getSettings = async (req: RequestWithToken, res: Response) => {
   try {
     const userId = req.user._id;
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }

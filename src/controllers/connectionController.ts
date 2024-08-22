@@ -9,10 +9,9 @@ import { createNotification } from "../utils/notificationSetter";
 export const getConnection = asyncHandler(
   async (req: Request, res: Response) => {
     const { userId } = req.body;
-    const connection =await Connections.findOne({ userId }).populate('connections')
-    .populate('requested')
-    .populate('requestSent');
-
+    const connection =await Connections.findOne({ userId }).populate('connections', { password: 0, refreshToken: 0 })
+    .populate('requested', { password: 0, refreshToken: 0 })
+    .populate('requestSent', { password: 0, refreshToken: 0 });
 
     res.status(200).json({ connection: connection });
   } 

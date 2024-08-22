@@ -29,7 +29,6 @@ async function sendInterviewReminders() {
 }
 
 export function scheduleInterviewReminders() {
-  // Run the cron job every day at 9:00 AM
   cron.schedule('0 9 * * *', sendInterviewReminders);
   console.log('Interview reminder cron job scheduled');
 }

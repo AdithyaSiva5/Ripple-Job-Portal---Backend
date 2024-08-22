@@ -114,7 +114,7 @@ export const validatePayment = async (req: Request, res: Response) => {
         isPremium: true,
         premiumExpiryDate: expiryDate,
       });
-      const updatedUser = await User.findById(userId, { password: 0 });
+      const updatedUser = await User.findById(userId, { password: 0 , refreshToken: 0  });
 
       return res.json({
         success: true,

@@ -148,7 +148,7 @@ export const savePostController = asyncHandler(
     
     
     const { postId,jobId ,userId } = req.body;
-    const user = await User.findById(userId);
+    const user = await User.findById(userId, { password: 0, refreshToken: 0 });
     if (!user) {
       res.status(404);
       throw new Error("User not found");

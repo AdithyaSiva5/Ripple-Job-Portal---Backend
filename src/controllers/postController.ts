@@ -53,7 +53,9 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("No Post available");
   }
 
-  res.status(200).json({ message: "Post added successfully", posts: populatedPost });
+  res
+    .status(200)
+    .json({ message: "Post added successfully", posts: populatedPost });
 });
 
 // @desc    Get all Posts
@@ -62,7 +64,7 @@ export const addPost = asyncHandler(async (req: Request, res: Response) => {
 
 export const getPost = asyncHandler(async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 1;
-  const limit = 2;
+  const limit = 4;
   const skip = (page - 1) * limit;
 
   const posts = await Post.find({ isBlocked: false, isDeleted: false })
