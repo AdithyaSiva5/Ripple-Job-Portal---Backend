@@ -70,19 +70,19 @@ To get a local copy of the backend up and running, follow these steps:
 2. Edit `.env` and configure the following variables:
 
    ```dotenv
-PORT = 3000
-MONGO_URL = 
-JWT_SECRET = 
-SESSION_SECRET = 
-NODEMAILER_EMAIL=
-NODEMAILER_PASSWORD =
-SMTP_HOST=
-SMTP_PORT=
-SUCCESS_URL=
-CANCEL_URL=
-DOMAIN_URL=
-STRIPE_SECRET=
-NODE_ENV = production 
+      PORT = 3000
+      MONGO_URL = 
+      JWT_SECRET = 
+      SESSION_SECRET = 
+      NODEMAILER_EMAIL=
+      NODEMAILER_PASSWORD =
+      SMTP_HOST=
+      SMTP_PORT=
+      SUCCESS_URL=
+      CANCEL_URL=
+      DOMAIN_URL=
+      STRIPE_SECRET=
+      NODE_ENV = production 
    ```
 
 ## Usage
