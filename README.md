@@ -2,6 +2,10 @@
 
 Welcome to the backend repository for the Connect social media project. This repository contains the server-side code and APIs necessary to support the Connect platform.
 
+## Related Repositories
+- [Frontend Repository]([https://github.com/your-username/your-frontend-repo](https://github.com/AdithyaSiva5/Ripple-Job-Portal-Frontend))
+
+
 ## Table of Contents
 
 - [Introduction](#introduction)
