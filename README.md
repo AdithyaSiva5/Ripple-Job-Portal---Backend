@@ -49,7 +49,7 @@ To get a local copy of the backend up and running, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/RameezIbrahimOfficial/connect-backend.git
+   git clone https://github.com/AdithyaSiva5/Ripple-Job-Portal-Backend.git
    ```
 
 2. Navigate into the project directory:
